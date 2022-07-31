@@ -1,0 +1,35 @@
+{
+	"editor.fontFamily": "'Cascadia Mono PL','Cascadia Code','Droid Sans Mono', 'monospace', monospace",
+	"editor.tokenColorCustomizations": {
+		"textMateRules": [
+		  {
+			"scope": [
+			  "comment",
+			  "entity.name.type.class", //class names
+	   "entity.other.attribute-name", //HTML Attributes
+			  "keyword", //import, export, return…
+			  "constant", //String, Number, Boolean…, this, super
+			  "storage.modifier", //static keyword
+			  "storage.type.class.js", //class keyword
+			],
+			"settings": {
+			  "fontStyle": "italic"
+			}
+		  },
+		  {
+			"scope": [
+			  //following will be excluded from italics (VSCode has some defaults for italics)
+			  "invalid",
+			  "keyword.operator",
+			  "constant.numeric.css",
+			  "keyword.other.unit.px.css",
+			  "constant.numeric.decimal.js",
+			  "constant.numeric.json"
+			],
+			"settings": {
+			  "fontStyle": "italic"
+			}
+		  }
+		]
+	  }
+}
