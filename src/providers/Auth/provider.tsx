@@ -1,10 +1,9 @@
 import { notification } from "antd";
 import React, { useCallback, useEffect, useState } from "react";
+import { useHistory } from "react-router-dom";
 import api from "../../api";
-import { UserType } from "../../utils/enums";
 import { useBreadcrumbs } from "../Breadcrumbs";
 import Context from "./context";
-import { useHistory } from "react-router-dom";
 
 const PERSIST_KEY = "@cpcmsa";
 
@@ -24,27 +23,17 @@ const Provider: React.FC<ProviderProps> = ({ children }) => {
 	const login = useCallback(
 		async (email: string, password: string) => {
 			try {
-				const { data } = await api.post("/auth/login", {
-					email,
-					password,
+				const { data } = await api.post("/api/crm/sessions/crm", {
+					login: email,
+					password: password,
 				});
 
 				if (data) {
-					api.defaults.headers["Authorization"] = `Bearer ${data.access_token}`;
-
-					if (data.franchisee || data.franchisee_id) {
-						api.defaults.headers["franchisee_id"] =
-							data?.franchisee?.id || data?.franchisee_id;
-					}
-
-					const zone = (data?.zones || []).slice().shift();
-
+					api.defaults.headers.common["Authorization"] = `Bearer ${data.token}`;
 					setState({
 						...state,
 						...data,
 						isAuthenticated: true,
-						...(data.franchisee ? { franchisee_id: data.franchisee.id } : {}),
-						...(zone ? { zone_id: zone.id } : {}),
 					});
 				}
 			} catch (error) {
@@ -57,9 +46,7 @@ const Provider: React.FC<ProviderProps> = ({ children }) => {
 	const logout = useCallback(() => {
 		setBreadcrumbs([]);
 		localStorage.removeItem(PERSIST_KEY);
-		api.defaults.headers["Authorization"] = undefined;
-		api.defaults.headers["franchisee_id"] = undefined;
-
+		api.defaults.headers.common["Authorization"] = false;
 		setState({
 			isAuthenticated: false,
 		});
@@ -69,55 +56,22 @@ const Provider: React.FC<ProviderProps> = ({ children }) => {
 		}
 	}, [history, setBreadcrumbs]);
 
-	const hasZones = useCallback(() => {
-		return state?.zones?.length > 0;
-	}, [state]);
-
-	const selectZone = useCallback(
-		(id: any) => {
-			return setState({
-				...state,
-				zone_id: id,
-			});
-		},
-		[state]
-	);
-
-	const userTypeIs = useCallback(
-		(type: any) => {
-			return (
-				(Array.isArray(type) ? type : [type]).indexOf(state.user_type) > -1
-			);
-		},
-		[state]
-	);
-
-	const passwordIsUpdated = useCallback(() => {
-		setState({
-			...state,
-			must_reset_password: false,
-		});
+	const userTypeIs = useCallback(() => {
+		return state.user.is_admin as boolean;
 	}, [state]);
 
 	const checkPermission = useCallback(
-		(type: any) => {
-			return true;
-			if (userTypeIs([UserType.Clerk, UserType.Franchisee])) {
-				if (hasZones()) {
-					return userTypeIs(type);
-				}
-				return false;
-			}
-			return userTypeIs(type);
+		(userType: number) => {
+			if (userTypeIs()) return true;
+			return userType === 2 ? true : false;
 		},
-		[hasZones, userTypeIs]
+		[userTypeIs]
 	);
 
 	if (savedState && savedState["access_token"]) {
-		api.defaults.headers[
+		api.defaults.headers.common[
 			"Authorization"
 		] = `Bearer ${savedState["access_token"]}`;
-
 		api.interceptors.response.use(
 			(response: any) => {
 				return response;
@@ -179,10 +133,6 @@ const Provider: React.FC<ProviderProps> = ({ children }) => {
 				return Promise.reject(new Error(error));
 			}
 		);
-		if (savedState.franchisee || savedState.franchisee_id) {
-			api.defaults.headers["franchisee_id"] =
-				savedState?.franchisee?.id || savedState.franchisee_id;
-		}
 	}
 
 	useEffect(() => {
@@ -201,9 +151,6 @@ const Provider: React.FC<ProviderProps> = ({ children }) => {
 				logout,
 				userTypeIs,
 				checkPermission,
-				hasZones,
-				selectZone,
-				passwordIsUpdated,
 			}}
 		>
 			{children}

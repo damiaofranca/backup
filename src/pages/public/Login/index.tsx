@@ -52,7 +52,7 @@ const Login: React.FC = () => {
 						<ContainerFlexSlotRight>
 							<ContainerFlexSlotRightTitles>
 								<Title className="primary-title" level={3}>
-									CRM Produtos <br /> Nossa plataforma de dados
+									Nossa plataforma de <br /> vendas digitais
 								</Title>
 								<Title level={5}>
 									Obtenha todos os dados e informações necessárias.
