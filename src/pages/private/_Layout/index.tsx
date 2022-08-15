@@ -1,19 +1,11 @@
 import {
-	ApartmentOutlined,
 	DashboardOutlined,
-	EnvironmentOutlined,
 	ExclamationCircleOutlined,
-	FileDoneOutlined,
-	FileOutlined,
 	LogoutOutlined,
 	MenuFoldOutlined,
 	MenuUnfoldOutlined,
-	MobileOutlined,
 	ProfileOutlined,
-	PushpinOutlined,
-	ShoppingCartOutlined,
-	ShoppingOutlined,
-	StockOutlined,
+	SmileOutlined,
 	UserOutlined,
 } from "@ant-design/icons";
 import { Button, Col, Layout, Menu, Modal, Row } from "antd";
@@ -23,8 +15,12 @@ import logoImage from "../../../assets/logo.svg";
 import { CheckPermArg, useAuth } from "../../../providers/Auth";
 import Router from "../../../routes/route";
 import { UserType } from "../../../utils/enums";
+import { Clients } from "../Clients";
+import { Details } from "../Clients/Details";
 import Home from "../Home";
-import { Partners } from "../Partners/Partners";
+import { Leads } from "../Leads";
+import { Partners } from "../Partners";
+import { Users } from "../Users";
 import { Container } from "./styles";
 
 const { Header, Content, Sider } = Layout;
@@ -93,8 +89,26 @@ const _Layout = () => {
 
 						{buildMenu(
 							UserType.Admin,
-							<Menu.Item key="partners" icon={<ShoppingCartOutlined />}>
-								Franquias
+							<Menu.Item key="partners" icon={<UserOutlined />}>
+								Parceiros
+							</Menu.Item>
+						)}
+						{buildMenu(
+							UserType.Admin,
+							<Menu.Item key="leads" icon={<ProfileOutlined />}>
+								Leads
+							</Menu.Item>
+						)}
+						{buildMenu(
+							UserType.Admin,
+							<Menu.Item key="users" icon={<UserOutlined />}>
+								Usuários
+							</Menu.Item>
+						)}
+						{buildMenu(
+							UserType.Admin,
+							<Menu.Item key="clients" icon={<SmileOutlined />}>
+								Clientes
 							</Menu.Item>
 						)}
 					</Menu>
@@ -173,6 +187,34 @@ const _Layout = () => {
 								userType={UserType.Admin || UserType.Franchisee}
 								path="/partners"
 								component={Partners}
+							/>
+
+							<Router
+								isPrivate
+								userType={UserType.Admin || UserType.Franchisee}
+								path="/leads"
+								component={Leads}
+							/>
+							<Router
+								isPrivate
+								userType={UserType.Admin || UserType.Franchisee}
+								path="/users"
+								component={Users}
+							/>
+
+							<Router
+								isPrivate
+								exact
+								userType={UserType.Admin || UserType.Franchisee}
+								path="/clients"
+								component={Clients}
+							/>
+
+							<Router
+								isPrivate
+								userType={UserType.Admin}
+								path="/clients/:clientId"
+								component={Details}
 							/>
 						</Switch>
 					</Content>

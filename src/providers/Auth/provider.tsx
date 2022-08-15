@@ -27,9 +27,8 @@ const Provider: React.FC<ProviderProps> = ({ children }) => {
 					login: email,
 					password: password,
 				});
-
 				if (data) {
-					api.defaults.headers.common["Authorization"] = `Bearer ${data.token}`;
+					api.defaults.headers["Authorization"] = `Bearer ${data.token}`;
 					setState({
 						...state,
 						...data,
@@ -46,7 +45,7 @@ const Provider: React.FC<ProviderProps> = ({ children }) => {
 	const logout = useCallback(() => {
 		setBreadcrumbs([]);
 		localStorage.removeItem(PERSIST_KEY);
-		api.defaults.headers.common["Authorization"] = false;
+		api.defaults.headers["Authorization"] = undefined;
 		setState({
 			isAuthenticated: false,
 		});
@@ -69,7 +68,7 @@ const Provider: React.FC<ProviderProps> = ({ children }) => {
 	);
 
 	if (savedState && savedState["access_token"]) {
-		api.defaults.headers.common[
+		api.defaults.headers[
 			"Authorization"
 		] = `Bearer ${savedState["access_token"]}`;
 		api.interceptors.response.use(
