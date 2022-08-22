@@ -51,7 +51,7 @@ export const EditPassword: React.FC<EditPasswordProps> = ({
 				token: user.token,
 			});
 		}
-	}, [user]);
+	}, [user, form]);
 
 	return (
 		<Modal
@@ -60,6 +60,7 @@ export const EditPassword: React.FC<EditPasswordProps> = ({
 			closable={false}
 			maskClosable={false}
 			okText="Adicionar"
+			data-testid={"modal-el"}
 			okButtonProps={{
 				htmlType: "submit",
 				disabled: loading,
@@ -88,13 +89,17 @@ export const EditPassword: React.FC<EditPasswordProps> = ({
 				form={form}
 				name="control-hooks"
 				onFinish={onFinish}
+				data-testid={"form-el"}
 			>
 				<Form.Item
 					name="password"
 					label="Senha"
 					rules={[{ required: true, max: 512, min: 6 }]}
 				>
-					<Input placeholder="Digite a nova senha" />
+					<Input
+						placeholder="Digite a nova senha"
+						data-testid={"password-input-form"}
+					/>
 				</Form.Item>
 			</Form>
 		</Modal>

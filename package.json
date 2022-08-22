@@ -22,6 +22,7 @@
 		"react-scripts": "5.0.1",
 		"react-text-mask": "^5.4.3",
 		"styled-components": "^5.3.5",
+		"svg-jest": "^1.0.1",
 		"text-mask-addons": "^3.8.0",
 		"typescript": "^4.7.4",
 		"web-vitals": "^2.1.4",
@@ -30,7 +31,7 @@
 	"scripts": {
 		"start": "craco start -H 0.0.0.0",
 		"build": "craco build",
-		"test": "jest --watch",
+		"test": "jest --watchAll",
 		"eject": "craco eject"
 	},
 	"eslintConfig": {
@@ -64,6 +65,7 @@
 		"@types/styled-components": "^5.1.25",
 		"@types/text-mask-addons": "^3.8.1",
 		"@types/yup": "^0.29.14",
+		"jest-transform-stub": "^2.0.0",
 		"ts-node": "^10.9.1"
 	}
 }

@@ -7,21 +7,23 @@ import {
 	ProfileOutlined,
 	SmileOutlined,
 	UserOutlined,
+	InboxOutlined,
 } from "@ant-design/icons";
-import { Button, Col, Layout, Menu, Modal, Row } from "antd";
-import React, { useState } from "react";
 import { Switch, useHistory, useLocation } from "react-router-dom";
-import logoImage from "../../../assets/logo.svg";
 import { CheckPermArg, useAuth } from "../../../providers/Auth";
-import Router from "../../../routes/route";
+import { Button, Col, Layout, Menu, Modal, Row } from "antd";
+import logoImage from "../../../assets/logo.svg";
 import { UserType } from "../../../utils/enums";
-import { Clients } from "../Clients";
 import { Details } from "../Clients/Details";
-import Home from "../Home";
-import { Leads } from "../Leads";
+import Router from "../../../routes/route";
+import React, { useState } from "react";
 import { Partners } from "../Partners";
-import { Users } from "../Users";
+import { Clients } from "../Clients";
 import { Container } from "./styles";
+import { Leads } from "../Leads";
+import { Users } from "../Users";
+import Home from "../Home";
+import { Products } from "../Products";
 
 const { Header, Content, Sider } = Layout;
 
@@ -29,7 +31,7 @@ const _Layout = () => {
 	const { pathname } = useLocation();
 	const { logout, checkPermission, userTypeIs } = useAuth();
 	const history = useHistory();
-	const [expanded, setExpanded] = useState(true);
+	const [expanded, setExpanded] = useState(false);
 
 	const handleToggleMenu = () => {
 		setExpanded(!expanded);
@@ -56,7 +58,7 @@ const _Layout = () => {
 	};
 
 	return (
-		<Container>
+		<Container data-testid={"container-el"}>
 			<Container>
 				<Sider
 					trigger={null}
@@ -109,6 +111,13 @@ const _Layout = () => {
 							UserType.Admin,
 							<Menu.Item key="clients" icon={<SmileOutlined />}>
 								Clientes
+							</Menu.Item>
+						)}
+
+						{buildMenu(
+							UserType.Admin,
+							<Menu.Item key="products" icon={<InboxOutlined />}>
+								Produtos
 							</Menu.Item>
 						)}
 					</Menu>
@@ -215,6 +224,13 @@ const _Layout = () => {
 								userType={UserType.Admin}
 								path="/clients/:clientId"
 								component={Details}
+							/>
+
+							<Router
+								isPrivate
+								userType={UserType.Admin}
+								path="/products"
+								component={Products}
 							/>
 						</Switch>
 					</Content>

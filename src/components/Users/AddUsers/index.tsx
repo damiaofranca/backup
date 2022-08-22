@@ -1,8 +1,6 @@
 import { Form, Input, Modal, notification } from "antd";
-import { ReactNode, useState } from "react";
+import { useState } from "react";
 import api from "../../../api";
-
-import { Container } from "./styles";
 
 interface AddUserProps {
 	onCancel: () => void;
@@ -79,27 +77,37 @@ export const AddUser: React.FC<AddUserProps> = ({
 				form={form}
 				name="control-hooks"
 				onFinish={onFinish}
+				data-testid="form-el"
 			>
 				<Form.Item
 					name="name"
 					label="Nome"
 					rules={[{ required: true, max: 512, min: 2 }]}
 				>
-					<Input placeholder="Digite o nome do usuário" />
+					<Input
+						placeholder="Digite o nome do usuário"
+						data-testid="name-input-form"
+					/>
 				</Form.Item>
 				<Form.Item
 					name="email"
 					label="Email"
 					rules={[{ required: true, max: 512, min: 2, type: "email" }]}
 				>
-					<Input placeholder="Digite o email do usuário" />
+					<Input
+						placeholder="Digite o email do usuário"
+						data-testid="email-input-form"
+					/>
 				</Form.Item>
 				<Form.Item
 					name="password"
 					label="Senha"
 					rules={[{ required: true, max: 512, min: 6 }]}
 				>
-					<Input placeholder="Digite a senha do usuário" />
+					<Input
+						placeholder="Digite a senha do usuário"
+						data-testid="password-input-form"
+					/>
 				</Form.Item>
 			</Form>
 		</Modal>

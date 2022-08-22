@@ -1,146 +1,219 @@
-import { ReloadOutlined } from "@ant-design/icons";
 import {
 	Button,
 	Col,
-	notification,
+	Divider,
+	Form,
+	Input,
 	PageHeader,
 	Row,
+	Space,
 	Table,
 	TableColumnType,
 	Tabs,
+	Tag,
 } from "antd";
+import { format } from "date-fns";
+import React, { useEffect, useState } from "react";
+import { useHistory } from "react-router-dom";
+import { DescriptionShorter } from "../../../../utils/description";
+import { documentCPF, phoneNumber } from "../../../../utils/validators";
+import { mockDetail } from "./mock";
 import { Container } from "./styles";
-import React, { useCallback, useEffect, useState } from "react";
-import api from "../../../../api";
 const { TabPane } = Tabs;
 interface DetailsProps {}
 
 export const Details: React.FC<DetailsProps> = (props) => {
+	const history = useHistory();
+	const [form] = Form.useForm();
 	const [data, setData] = useState([]);
+	const [isEditing, setIsEditing] = useState(false);
 	const [tableLoading, setTableLoading] = useState(false);
 	const [shouldReloadTable, setShouldReloadTable] = useState(false);
-	const onHandleReloadData = () => setShouldReloadTable(!shouldReloadTable);
 	const [tablePagination, setTablePagination] = useState({
 		current: 1,
 		pageSize: 10,
 		showSizeChanger: true,
 	});
-	const loadData = useCallback(async (params: any) => {
-		setTableLoading(true);
-		const { current, pageSize, sortField, sortOrder, filters } = params;
-		try {
-			const { data } = await api.get("/api/crm/accounts", {
-				params: {
-					per_page: pageSize,
-					page: current,
-				},
-			});
-			return data;
-		} catch (error) {
-			throw new Error("Erro ao carregar dados! " + error);
-		} finally {
-			setTableLoading(false);
-		}
-	}, []);
 
 	const tableCols: TableColumnType<any>[] = [
 		{
 			key: "id",
 			title: "Nome",
-			dataIndex: "name",
 			sorter: {
-				compare: (a, b) => a.name.localeCompare(b.name),
+				compare: (a, b) => a.plan.name.localeCompare(b.plan.name),
+			},
+			render: (_, record) => {
+				return <>{record.plan.name}</>;
+			},
+			width: 280,
+		},
+		{
+			key: "description",
+			title: "Descrição do produto",
+			dataIndex: "description",
+			render: (_, record) => {
+				return (
+					<DescriptionShorter
+						description={record.plan.description}
+						limit={36}
+					/>
+				);
+			},
+			width: 300,
+		},
+		{
+			key: "price",
+			title: "Preço",
+			dataIndex: "price",
+			render: (_, record) => {
+				return <>{record.plan.price + " R$"}</>;
 			},
 		},
 		{
-			key: "email",
-			title: "Email",
-			dataIndex: "email",
+			key: "start_date",
+			title: "Data de aquisição",
+			dataIndex: "start_date",
+			render: (_, record) => {
+				return <>{format(new Date(record.start_date), "dd/MM/yyyy")}</>;
+			},
+		},
+		{
+			key: "validate_date",
+			title: "Data de expiração",
+			dataIndex: "validate_date",
+			render: (_, record) => {
+				return <>{format(new Date(record.validate_date), "dd/MM/yyyy")}</>;
+			},
+		},
+		{
+			key: "end_date",
+			title: "Data do próximo pagamento",
+			dataIndex: "end_date",
+			render: (_, record) => {
+				return <>{format(new Date(record.end_date), "dd/MM/yyyy")}</>;
+			},
+		},
+		{
+			key: "is_active",
+			title: "Status da assinatura",
+			dataIndex: "is_active",
+			render: (_, record) => {
+				return (
+					<Tag color={record.is_active === true ? "green" : "volcano"}>
+						{record.is_active === true ? "Ativado" : "Desativado"}
+					</Tag>
+				);
+			},
 		},
 	];
-
-	const onHandleTableChange = (pagination: any, filters: any, sorter: any) => {
-		if (!pagination) return;
-		let newFilters: any = {};
-		for (const key in filters) {
-			if (filters[key] === null) continue;
-			const value = filters[key];
-			if (value.length > 1) {
-				newFilters[key] = value;
-				continue;
-			}
-			newFilters[key] = value[0];
-		}
-
-		loadData({
-			sortField: sorter.field,
-			sortOrder: sorter.order,
-			...pagination,
-			filters: newFilters,
-		})
-			.then((response) => {
-				setTablePagination((old) => ({
-					...old,
-					...pagination,
-					total: response.total,
-				}));
-				setData(response.data);
-			})
-			.catch(() => notification.error({ message: "Erro ao carregar dados!" }));
-	};
-
 	useEffect(() => {
-		let didCancel = false;
-		loadData({
-			current: 1,
-			pageSize: 10,
-		})
-			.then((response) => {
-				!didCancel && setData(response.data);
-				setTablePagination((old) => ({ ...old, total: response.total }));
-			})
-			.catch(() => notification.error({ message: "Erro ao carregar dados!" }));
-
-		return () => {
-			didCancel = true;
-		};
-	}, [loadData, shouldReloadTable]);
+		form.setFieldsValue({
+			name: mockDetail.name,
+			email: mockDetail.email,
+			document: mockDetail.document,
+			phone_number: mockDetail.phone_number,
+		});
+	}, [form]);
 
 	return (
 		<Container>
-			<PageHeader
-				title="Detalhes"
-				subTitle=""
-				extra={[
-					<Button
-						key="bt-ds-reload"
-						icon={<ReloadOutlined />}
-						onChange={onHandleReloadData}
-					>
-						Recarregar dados
-					</Button>,
-				]}
-			>
-				<Row style={{ marginTop: 12 }}>
-					<Col md={24}>
-						<Tabs defaultActiveKey="1">
-							<TabPane tab="Assinaturas" key="1">
-								<Table
-									size="middle"
-									rowKey={(record: any) => record.id}
-									dataSource={data}
-									columns={tableCols}
-									loading={tableLoading}
-									pagination={tablePagination}
-									onChange={onHandleTableChange}
-								/>{" "}
-							</TabPane>
-							<TabPane tab="Informações do cliente" key="2">
-								Content of Tab Pane 2
-							</TabPane>
-						</Tabs>
-					</Col>
-				</Row>
+			<PageHeader title="Detalhes" onBack={() => history.goBack()}>
+				<Tabs defaultActiveKey="details">
+					<Tabs.TabPane tab="Dados gerais" key="details">
+						<Form form={form} layout="vertical" autoComplete="off">
+							<Row gutter={16}>
+								<Col md={8}>
+									<Form.Item
+										name="name"
+										label="Nome"
+										rules={[{ required: true, max: 512, min: 2 }]}
+									>
+										<Input
+											placeholder="Digite o nome do cliente"
+											disabled={!isEditing}
+										/>
+									</Form.Item>
+								</Col>
+								<Col md={8}>
+									<Form.Item
+										name="email"
+										label="Email"
+										rules={[{ required: true, type: "email" }]}
+									>
+										<Input
+											placeholder="Digite o email do cliente"
+											disabled={!isEditing}
+										/>
+									</Form.Item>
+								</Col>
+								<Col md={8}>
+									<Form.Item
+										name="document"
+										label="Documento"
+										rules={[{ required: true }, { validator: documentCPF }]}
+									>
+										<Input
+											placeholder="Digite o documento do cliente"
+											disabled={!isEditing}
+										/>
+									</Form.Item>
+								</Col>
+								<Col md={8}>
+									<Form.Item
+										name="phone_number"
+										label="Telefone"
+										rules={[
+											{
+												required: true,
+												max: 512,
+												min: 2,
+												validator: phoneNumber,
+											},
+										]}
+									>
+										<Input
+											placeholder="Digite o telefone do cliente"
+											disabled={!isEditing}
+										/>
+									</Form.Item>
+								</Col>
+							</Row>
+							<Row justify="end">
+								<Col>
+									{isEditing ? (
+										<Space>
+											<Button
+												onClick={() => {
+													setIsEditing(false);
+													form.setFieldsValue(data);
+												}}
+												htmlType="button"
+											>
+												Cancelar
+											</Button>
+											<Button type="primary" htmlType="submit">
+												Salvar dados
+											</Button>
+										</Space>
+									) : null}
+								</Col>
+							</Row>
+						</Form>
+					</Tabs.TabPane>
+				</Tabs>
+				<Divider />
+				<Tabs defaultActiveKey="1">
+					<TabPane tab="Assinaturas" key="1">
+						<Table
+							size="middle"
+							rowKey={(record: any) => record.id}
+							dataSource={mockDetail.subscription}
+							columns={tableCols}
+							loading={tableLoading}
+							pagination={tablePagination}
+						/>
+					</TabPane>
+				</Tabs>
 			</PageHeader>
 		</Container>
 	);

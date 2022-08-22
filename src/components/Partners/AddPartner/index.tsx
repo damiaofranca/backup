@@ -1,8 +1,6 @@
 import { Form, Input, Modal, notification } from "antd";
-import { ReactNode, useState } from "react";
+import { useState } from "react";
 import api from "../../../api";
-
-import { Container } from "./styles";
 
 interface AddPartnerProps {
 	onCancel: () => void;
@@ -52,6 +50,7 @@ export const AddPartner: React.FC<AddPartnerProps> = ({
 			closable={false}
 			maskClosable={false}
 			okText="Adicionar"
+			data-testid="modal-el"
 			okButtonProps={{
 				htmlType: "submit",
 				disabled: loading,
@@ -86,7 +85,10 @@ export const AddPartner: React.FC<AddPartnerProps> = ({
 					label="Nome"
 					rules={[{ required: true, max: 512, min: 2 }]}
 				>
-					<Input placeholder="Digite o nome do parceiro" />
+					<Input
+						placeholder="Digite o nome do parceiro"
+						data-testid="name-input-el"
+					/>
 				</Form.Item>
 			</Form>
 		</Modal>

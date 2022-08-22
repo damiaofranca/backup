@@ -79,48 +79,67 @@ export const AddLeads: React.FC<AddPartnerProps> = ({
 				form={form}
 				name="control-hooks"
 				onFinish={onFinish}
+				data-testid="form-element"
 			>
 				<Form.Item
 					name="name"
 					label="Nome"
 					rules={[{ required: true, max: 512, min: 4 }]}
 				>
-					<Input placeholder="Digite o nome do lead" />
+					<Input
+						placeholder="Digite o nome do lead"
+						data-testid="name-input-el"
+					/>
 				</Form.Item>
 				<Form.Item
 					name="email"
 					label="Email"
 					rules={[{ required: true, max: 512, min: 4, type: "email" }]}
 				>
-					<Input placeholder="Digite o email do lead" />
+					<Input
+						placeholder="Digite o email do lead"
+						data-testid="email-input-el"
+					/>
 				</Form.Item>
 				<Form.Item
 					name="utm_campaign"
 					label="UTM Campanha"
 					rules={[{ required: true, max: 512, min: 4 }]}
 				>
-					<Input placeholder="Digite o UTM da campanha" />
+					<Input
+						placeholder="Digite o UTM da campanha"
+						data-testid="campaign-input-el"
+					/>
 				</Form.Item>
 				<Form.Item
 					name="utm_medium"
 					label="UTM Médio"
 					rules={[{ required: true, max: 512, min: 4 }]}
 				>
-					<Input placeholder="Digite o UTM médio" />
+					<Input
+						placeholder="Digite o UTM médio"
+						data-testid="medium-input-el"
+					/>
 				</Form.Item>
 				<Form.Item
 					name="utm_source"
 					label="UTM Fonte"
 					rules={[{ required: true, max: 512, min: 4 }]}
 				>
-					<Input placeholder="Digite o UTM da fonte" />
+					<Input
+						placeholder="Digite o UTM da fonte"
+						data-testid="source-input-el"
+					/>
 				</Form.Item>
 				<Form.Item
 					name="utm_term"
 					label="UTM Termo"
 					rules={[{ required: true, max: 512, min: 4 }]}
 				>
-					<Input placeholder="Digite o UTM do termo" />
+					<Input
+						placeholder="Digite o UTM do termo"
+						data-testid="term-input-el"
+					/>
 				</Form.Item>
 			</Form>
 		</Modal>
