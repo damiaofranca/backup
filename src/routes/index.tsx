@@ -14,7 +14,6 @@ const Routes = () => {
 		tokenUser.token !== undefined &&
 		tokenUser.token !== null
 	) {
-		console.log(`fsadfs`);
 		api.defaults.headers.common["Authorization"] = `Bearer ${tokenUser.token}`;
 	}
 

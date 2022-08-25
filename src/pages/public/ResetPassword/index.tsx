@@ -1,8 +1,8 @@
-import { useHistory, useParams } from "react-router-dom";
-import logoImage from "../../../assets/logo-white.svg";
 import { Button, Input, notification } from "antd";
 import { useState } from "react";
+import { useHistory, useParams } from "react-router-dom";
 import api from "../../../api";
+import logoImage from "../../../assets/logo-white.svg";
 
 import {
 	Actions,
@@ -28,7 +28,7 @@ export const ResetPassword: React.FC<ResetPasswordProps> = () => {
 	const resetPassword = async () => {
 		if (password.length > 8) {
 			try {
-				await api.post(`/api/accounts/reset/password`, {
+				await api.post(`/api/crm/accounts/reset/password`, {
 					password,
 					token,
 				});

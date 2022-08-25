@@ -47,15 +47,35 @@ export const Users: React.FC = (props) => {
 
 	const sendEmailToReset = async (email: string) => {
 		try {
-			await api.get("/api/accounts/reset-password", {
-				params: {
-					email: email,
-				},
+			await api.patch("/api/crm/accounts/reset-password", {
+				email,
 			});
-			notification.error({ message: "Email enviado com sucesso!" });
+			notification.success({ message: "Email enviado com sucesso!" });
 		} catch (error) {
 			notification.error({ message: "Erro ao enviar dados!" });
-			throw new Error("Erro ao carregar dados! " + error);
+			throw new Error("Erro ao enviar dados! " + error);
+		}
+	};
+
+	const deleteUser = async (id: string) => {
+		try {
+			await api.delete(`api/crm/accounts/user/${id}`);
+			await loadData({
+				current: 1,
+				pageSize: defaultPageSize,
+			})
+				.then((response) => {
+					setData(response.data);
+					setTablePagination((old) => ({ ...old, total: response.total }));
+				})
+				.catch(() =>
+					notification.error({ message: "Erro ao carregar dados!" })
+				);
+
+			notification.success({ message: "Usuário deletado com sucesso!" });
+		} catch (error) {
+			notification.error({ message: "Erro ao deletar usuário!" });
+			throw new Error("Erro ao deletar usuário! " + error);
 		}
 	};
 
@@ -120,7 +140,12 @@ export const Users: React.FC = (props) => {
 								Alterar senha
 							</Button>
 						</Popconfirm>
-						<Popconfirm title="Têm certeza que deseja deletar o usuário ?">
+						<Popconfirm
+							title="Têm certeza que deseja deletar o usuário ?"
+							onConfirm={() => {
+								deleteUser(record.id);
+							}}
+						>
 							<Button key="bt-delete" size="small">
 								deletar
 							</Button>
@@ -151,13 +176,12 @@ export const Users: React.FC = (props) => {
 			filters: newFilters,
 		})
 			.then((response) => {
-				// setTablePagination((old) => ({
-				// 	...old,
-				// 	...pagination,
-				// 	total: response.total,
-				// }));
-				// setData(response.data);
-				setData(response);
+				setTablePagination((old) => ({
+					...old,
+					...pagination,
+					total: response.total,
+				}));
+				setData(response.data);
 			})
 			.catch(() => notification.error({ message: "Erro ao carregar dados!" }));
 	};
@@ -169,9 +193,8 @@ export const Users: React.FC = (props) => {
 			pageSize: defaultPageSize,
 		})
 			.then((response) => {
-				!didCancel && setData(response);
-				// !didCancel && setData(response.data);
-				// setTablePagination((old) => ({ ...old, total: response.total }));
+				!didCancel && setData(response.data);
+				setTablePagination((old) => ({ ...old, total: response.total }));
 			})
 			.catch(() => notification.error({ message: "Erro ao carregar dados!" }));
 
