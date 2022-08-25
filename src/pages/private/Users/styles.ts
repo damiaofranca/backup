@@ -7,3 +7,11 @@ export const Container = styled.div`
 		margin-bottom: 10px;
 	}
 `;
+
+export const ContainerActions = styled.div`
+	display: flex;
+
+	& > button {
+		margin: 0 0.2rem;
+	}
+`;

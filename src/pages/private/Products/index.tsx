@@ -1,24 +1,25 @@
+import { AddProduct } from "../../../components/Products/AddProducts";
 import { PlusOutlined, ReloadOutlined } from "@ant-design/icons";
-import {
-	Button,
-	Col,
-	PageHeader,
-	Row,
-	Table,
-	TableColumnType,
-	Tag,
-} from "antd";
-import { format } from "date-fns";
-import { productMock } from "../Clients/Details/mock";
-
-import { useState } from "react";
 import { DescriptionShorter } from "../../../utils/description";
 import { Container } from "./styles";
+import { format } from "date-fns";
+import { useState } from "react";
+import productMock from "./mock";
+import {
+	TableColumnType,
+	PageHeader,
+	Button,
+	Table,
+	Col,
+	Row,
+	Tag,
+} from "antd";
 
 interface ProductsProps {}
 
 export const Products: React.FC<ProductsProps> = () => {
 	const [tableLoading, setTableLoading] = useState(false);
+	const [isVisibleModal, setIsVisibleModal] = useState(false);
 	const [tablePagination, setTablePagination] = useState({
 		current: 1,
 		pageSize: 10,
@@ -99,16 +100,18 @@ export const Products: React.FC<ProductsProps> = () => {
 			align: "center",
 			render: (_, record) => {
 				return (
-					<Button key="bt-view" size="small">
-						Editar
-					</Button>
+					<>
+						<Button key="bt-view" size="small">
+							Editar
+						</Button>
+					</>
 				);
 			},
 		},
 	];
 
 	return (
-		<Container>
+		<Container data-testid="container-el">
 			<PageHeader
 				title="Produtos"
 				subTitle=""
@@ -116,7 +119,12 @@ export const Products: React.FC<ProductsProps> = () => {
 					<Button key="bt-ds-reload" icon={<ReloadOutlined />}>
 						Recarregar dados
 					</Button>,
-					<Button key="bt-ds-new" type="primary" icon={<PlusOutlined />}>
+					<Button
+						key="bt-ds-new"
+						type="primary"
+						icon={<PlusOutlined />}
+						onClick={() => setIsVisibleModal(true)}
+					>
 						Novo
 					</Button>,
 				]}
@@ -124,16 +132,22 @@ export const Products: React.FC<ProductsProps> = () => {
 				<Row style={{ marginTop: 12 }}>
 					<Col md={24}>
 						<Table
-							size="middle"
 							rowKey={(record: any) => record.id}
-							dataSource={productMock}
-							columns={tableCols}
-							loading={tableLoading}
 							pagination={tablePagination}
+							dataSource={productMock}
+							loading={tableLoading}
+							data-testid="table-el"
+							columns={tableCols}
+							size="middle"
 						/>
 					</Col>
 				</Row>
 			</PageHeader>
+			<AddProduct
+				isVisible={isVisibleModal}
+				onCancel={() => setIsVisibleModal(false)}
+				onSubmit={() => {}}
+			/>
 		</Container>
 	);
 };

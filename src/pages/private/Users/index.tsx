@@ -1,18 +1,19 @@
+import { PlusOutlined, ReloadOutlined } from "@ant-design/icons";
 import {
 	Button,
 	Col,
 	notification,
 	PageHeader,
+	Popconfirm,
 	Row,
 	Table,
 	TableColumnType,
 } from "antd";
-import api from "../../../api";
-import { Container } from "./styles";
-import { AddUser } from "../../../components/Users/AddUsers";
 import React, { useCallback, useEffect, useState } from "react";
-import { PlusOutlined, ReloadOutlined } from "@ant-design/icons";
-import { EditPassword } from "../../../components/Users/EditPassword";
+import api from "../../../api";
+import { AddUser } from "../../../components/Users/AddUsers";
+import { EditUser } from "../../../components/Users/EditUser";
+import { Container, ContainerActions } from "./styles";
 
 export const Users: React.FC = (props) => {
 	const defaultPageSize = 10;
@@ -20,23 +21,49 @@ export const Users: React.FC = (props) => {
 	const [tableLoading, setTableLoading] = useState(false);
 	const [tablePagination, setTablePagination] = useState({
 		current: 1,
-		pageSize: defaultPageSize,
 		showSizeChanger: true,
+		pageSize: defaultPageSize,
 	});
 	const [isVisible, setIsVisible] = useState<boolean>(false);
-	const [isVisibleUpdatePassword, setIsVisibleUpdatePassword] =
-		useState<boolean>(false);
-	const [userInfo, setUserInfo] = useState<{ token: string }>({
-		token: "",
+	const [userInfo, setUserInfo] = useState<{
+		name: string | null;
+		email: string | null;
+		id: string | null;
+	}>({
+		email: null,
+		name: null,
+		id: null,
 	});
 	const [shouldReloadTable, setShouldReloadTable] = useState(false);
 	const onHandleReloadData = () => setShouldReloadTable(!shouldReloadTable);
+
+	const clearUserInfo = () => {
+		setUserInfo({
+			id: null,
+			name: null,
+			email: null,
+		});
+	};
+
+	const sendEmailToReset = async (email: string) => {
+		try {
+			await api.get("/api/accounts/reset-password", {
+				params: {
+					email: email,
+				},
+			});
+			notification.error({ message: "Email enviado com sucesso!" });
+		} catch (error) {
+			notification.error({ message: "Erro ao enviar dados!" });
+			throw new Error("Erro ao carregar dados! " + error);
+		}
+	};
 
 	const loadData = useCallback(async (params: any) => {
 		setTableLoading(true);
 		const { current, pageSize, sortField, sortOrder, filters } = params;
 		try {
-			const { data } = await api.get("/api/crm/accounts", {
+			const { data } = await api.get("/api/crm/accounts/users", {
 				params: {
 					per_page: pageSize,
 					page: current,
@@ -65,30 +92,40 @@ export const Users: React.FC = (props) => {
 			dataIndex: "email",
 		},
 		{
-			key: "phone_number",
-			title: "Telefone",
-			dataIndex: "phone_number",
-			render: (_, record) => {
-				return record.phone_number ? record.phone_number : "Não registrado";
-			},
-		},
-		{
 			key: "view",
 			title: "Ações",
 			width: "100px",
 			align: "center",
 			render: (_, record) => {
 				return (
-					<Button
-						key="bt-view"
-						size="small"
-						onClick={() => {
-							setUserInfo({ token: record.id });
-							setIsVisibleUpdatePassword(true);
-						}}
-					>
-						Trocar senha
-					</Button>
+					<ContainerActions>
+						<Button
+							key="bt-edit"
+							size="small"
+							onClick={() => {
+								setUserInfo({
+									id: record.id,
+									name: record.name,
+									email: record.email,
+								});
+							}}
+						>
+							Editar
+						</Button>
+						<Popconfirm
+							title="Têm certeza que deseja trocar a senha ?"
+							onConfirm={() => sendEmailToReset(record.email)}
+						>
+							<Button key="bt-change-password" size="small">
+								Alterar senha
+							</Button>
+						</Popconfirm>
+						<Popconfirm title="Têm certeza que deseja deletar o usuário ?">
+							<Button key="bt-delete" size="small">
+								deletar
+							</Button>
+						</Popconfirm>
+					</ContainerActions>
 				);
 			},
 		},
@@ -114,12 +151,13 @@ export const Users: React.FC = (props) => {
 			filters: newFilters,
 		})
 			.then((response) => {
-				setTablePagination((old) => ({
-					...old,
-					...pagination,
-					total: response.total,
-				}));
-				setData(response.data);
+				// setTablePagination((old) => ({
+				// 	...old,
+				// 	...pagination,
+				// 	total: response.total,
+				// }));
+				// setData(response.data);
+				setData(response);
 			})
 			.catch(() => notification.error({ message: "Erro ao carregar dados!" }));
 	};
@@ -131,8 +169,9 @@ export const Users: React.FC = (props) => {
 			pageSize: defaultPageSize,
 		})
 			.then((response) => {
-				!didCancel && setData(response.data);
-				setTablePagination((old) => ({ ...old, total: response.total }));
+				!didCancel && setData(response);
+				// !didCancel && setData(response.data);
+				// setTablePagination((old) => ({ ...old, total: response.total }));
 			})
 			.catch(() => notification.error({ message: "Erro ao carregar dados!" }));
 
@@ -142,7 +181,7 @@ export const Users: React.FC = (props) => {
 	}, [loadData, shouldReloadTable]);
 
 	return (
-		<Container>
+		<Container data-testid="container-el">
 			<AddUser
 				isVisible={isVisible}
 				onSubmit={() => {
@@ -152,31 +191,32 @@ export const Users: React.FC = (props) => {
 				onCancel={() => setIsVisible(false)}
 			/>
 
-			<EditPassword
-				isVisible={isVisibleUpdatePassword}
+			<EditUser
+				isVisible={userInfo.name !== null ? true : false}
 				onSubmit={() => {
-					setIsVisibleUpdatePassword(false);
 					onHandleReloadData();
 				}}
 				user={userInfo}
-				onCancel={() => setIsVisibleUpdatePassword(false)}
+				onCancel={clearUserInfo}
 			/>
 			<PageHeader
 				title="Usuários"
 				subTitle=""
 				extra={[
 					<Button
-						key="bt-ds-reload"
-						icon={<ReloadOutlined />}
 						onClick={onHandleReloadData}
+						data-testid="load-data-el"
+						icon={<ReloadOutlined />}
+						key="bt-ds-reload"
 					>
 						Recarregar dados
 					</Button>,
 					<Button
+						onClick={() => setIsVisible(true)}
+						data-testid="new-data-el"
+						icon={<PlusOutlined />}
 						key="bt-ds-new"
 						type="primary"
-						icon={<PlusOutlined />}
-						onClick={() => setIsVisible(true)}
 					>
 						Novo
 					</Button>,
@@ -185,13 +225,14 @@ export const Users: React.FC = (props) => {
 				<Row style={{ marginTop: 12 }}>
 					<Col md={24}>
 						<Table
-							size="middle"
 							rowKey={(record: any) => record.id}
-							dataSource={data}
-							columns={tableCols}
-							loading={tableLoading}
-							pagination={tablePagination}
 							onChange={onHandleTableChange}
+							pagination={tablePagination}
+							loading={tableLoading}
+							data-testid="table-el"
+							columns={tableCols}
+							dataSource={data}
+							size="middle"
 						/>
 					</Col>
 				</Row>

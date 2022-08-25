@@ -88,7 +88,7 @@ export const Partners: React.FC = (props) => {
 	}, [loadData, shouldReloadTable]);
 
 	return (
-		<Container>
+		<Container data-testid="container-el">
 			<PageHeader
 				title="Parceiros"
 				subTitle=""
@@ -114,6 +114,7 @@ export const Partners: React.FC = (props) => {
 					<Col md={24}>
 						<Table
 							size="middle"
+							data-testid="table-el"
 							rowKey={(record: any) => record.value}
 							dataSource={data}
 							columns={tableCols}

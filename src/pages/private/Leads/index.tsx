@@ -10,6 +10,7 @@ import {
 } from "antd";
 import React, { useCallback, useEffect, useState } from "react";
 import api from "../../../api";
+import { FilterByDate } from "../../../utils/filterByDate";
 import { Container } from "./styles";
 
 export const Leads: React.FC = (props) => {
@@ -26,11 +27,21 @@ export const Leads: React.FC = (props) => {
 
 	const loadData = useCallback(async (params: any) => {
 		setTableLoading(true);
-		const { current, pageSize, sortField, sortOrder, filters } = params;
+		const {
+			start_date,
+			sortOrder,
+			sortField,
+			end_date,
+			pageSize,
+			current,
+			filters,
+		} = params;
 		try {
 			const { data } = await api.get("/api/crm/leads", {
 				params: {
 					filtered: "only_leads",
+					start_date: start_date,
+					end_date: end_date,
 					per_page: pageSize,
 					page: current,
 				},
@@ -109,11 +120,16 @@ export const Leads: React.FC = (props) => {
 			.catch(() => notification.error({ message: "Erro ao carregar dados!" }));
 	};
 
-	useEffect(() => {
+	const setDataLeads = (
+		start_date?: string | null,
+		end_date?: string | null
+	) => {
 		let didCancel = false;
 		loadData({
-			current: 1,
 			pageSize: defaultPageSize,
+			start_date: start_date,
+			end_date: end_date,
+			current: 1,
 		})
 			.then((response) => {
 				!didCancel && setData(response.data);
@@ -124,14 +140,27 @@ export const Leads: React.FC = (props) => {
 		return () => {
 			didCancel = true;
 		};
+	};
+
+	useEffect(() => {
+		setDataLeads();
 	}, [loadData, shouldReloadTable]);
 
 	return (
-		<Container>
+		<Container data-testid="container-el">
 			<PageHeader
 				title="Leads"
 				subTitle=""
 				extra={[
+					<FilterByDate
+						key={"filter"}
+						onReset={() => {
+							setDataLeads(null, null);
+						}}
+						onFilter={(start, end) => {
+							setDataLeads(start, end);
+						}}
+					/>,
 					<Button
 						key="bt-ds-reload"
 						icon={<ReloadOutlined />}
@@ -148,6 +177,7 @@ export const Leads: React.FC = (props) => {
 							rowKey={(record: any) => record.id}
 							dataSource={data}
 							columns={tableCols}
+							data-testid="table-el"
 							loading={tableLoading}
 							pagination={tablePagination}
 							onChange={onHandleTableChange}

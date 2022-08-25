@@ -1,28 +1,28 @@
-import {
-	Button,
-	Col,
-	Divider,
-	Form,
-	Input,
-	PageHeader,
-	Row,
-	Space,
-	Table,
-	TableColumnType,
-	Tabs,
-	Tag,
-} from "antd";
-import { format } from "date-fns";
+import { documentCPF, phoneNumber } from "../../../../utils/validators";
+import { DescriptionShorter } from "../../../../utils/description";
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
-import { DescriptionShorter } from "../../../../utils/description";
-import { documentCPF, phoneNumber } from "../../../../utils/validators";
-import { mockDetail } from "./mock";
 import { Container } from "./styles";
+import { format } from "date-fns";
+import mockDetail from "./mock";
+import {
+	TableColumnType,
+	PageHeader,
+	Divider,
+	Button,
+	Input,
+	Space,
+	Table,
+	Form,
+	Tabs,
+	Col,
+	Row,
+	Tag,
+} from "antd";
 const { TabPane } = Tabs;
 interface DetailsProps {}
 
-export const Details: React.FC<DetailsProps> = (props) => {
+export const Details: React.FC<DetailsProps> = () => {
 	const history = useHistory();
 	const [form] = Form.useForm();
 	const [data, setData] = useState([]);
@@ -116,11 +116,16 @@ export const Details: React.FC<DetailsProps> = (props) => {
 	}, [form]);
 
 	return (
-		<Container>
+		<Container data-testid="container-el">
 			<PageHeader title="Detalhes" onBack={() => history.goBack()}>
 				<Tabs defaultActiveKey="details">
 					<Tabs.TabPane tab="Dados gerais" key="details">
-						<Form form={form} layout="vertical" autoComplete="off">
+						<Form
+							form={form}
+							layout="vertical"
+							autoComplete="off"
+							data-testid="form-el"
+						>
 							<Row gutter={16}>
 								<Col md={8}>
 									<Form.Item
@@ -130,6 +135,7 @@ export const Details: React.FC<DetailsProps> = (props) => {
 									>
 										<Input
 											placeholder="Digite o nome do cliente"
+											data-testid="name-input-el"
 											disabled={!isEditing}
 										/>
 									</Form.Item>
@@ -142,6 +148,7 @@ export const Details: React.FC<DetailsProps> = (props) => {
 									>
 										<Input
 											placeholder="Digite o email do cliente"
+											data-testid="email-input-el"
 											disabled={!isEditing}
 										/>
 									</Form.Item>
@@ -154,6 +161,7 @@ export const Details: React.FC<DetailsProps> = (props) => {
 									>
 										<Input
 											placeholder="Digite o documento do cliente"
+											data-testid="document-input-el"
 											disabled={!isEditing}
 										/>
 									</Form.Item>
@@ -179,7 +187,7 @@ export const Details: React.FC<DetailsProps> = (props) => {
 								</Col>
 							</Row>
 							<Row justify="end">
-								<Col>
+								<Col data-testid="container-actions-el">
 									{isEditing ? (
 										<Space>
 											<Button
@@ -208,9 +216,10 @@ export const Details: React.FC<DetailsProps> = (props) => {
 							size="middle"
 							rowKey={(record: any) => record.id}
 							dataSource={mockDetail.subscription}
-							columns={tableCols}
-							loading={tableLoading}
 							pagination={tablePagination}
+							loading={tableLoading}
+							columns={tableCols}
+							data-testid="table-el"
 						/>
 					</TabPane>
 				</Tabs>
