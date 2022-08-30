@@ -1,20 +1,19 @@
+import "@testing-library/jest-dom";
 import { render } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import "@testing-library/jest-dom";
-import "../../../utils/matchMedia";
 import { Clients } from ".";
+import "../../../utils/matchMedia";
 
-test("should render all components", () => {
-	const { getByTestId } = render(
+describe("component of clients", () => {
+	const { getByTestId, getByLabelText } = render(
 		<MemoryRouter>
 			<Clients />
 		</MemoryRouter>
 	);
-	expect(getByTestId("container-el")).toBeInTheDocument();
-	expect(getByTestId("table-el")).toBeInTheDocument();
-	// expect(getByTestId("term-input-el")).toBeInTheDocument();
-	// expect(getByTestId("email-input-el")).toBeInTheDocument();
-	// expect(getByTestId("source-input-el")).toBeInTheDocument();
-	// expect(getByTestId("medium-input-el")).toBeInTheDocument();
-	// expect(getByTestId("campaign-input-el")).toBeInTheDocument();
+	const containerEl = getByLabelText("container-el");
+	const tableEl = getByTestId("table-clients-el");
+	test("should render all components", () => {
+		expect(containerEl).toBeInTheDocument();
+		expect(tableEl).toBeInTheDocument();
+	});
 });

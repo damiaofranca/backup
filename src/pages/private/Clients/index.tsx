@@ -59,12 +59,13 @@ export const Clients: React.FC = (props) => {
 	];
 
 	return (
-		<Container data-testid="container-el">
+		<Container aria-label="container-el">
 			<PageHeader
 				title="Clientes"
 				subTitle=""
 				extra={[
 					<Button
+						aria-label="btn-reload"
 						key="bt-ds-reload"
 						icon={<ReloadOutlined />}
 						onClick={onHandleReloadData}
@@ -80,7 +81,7 @@ export const Clients: React.FC = (props) => {
 							pagination={tablePagination}
 							dataSource={clientsMock}
 							loading={tableLoading}
-							data-testid="table-el"
+							data-testid="table-clients-el"
 							columns={tableCols}
 							size="middle"
 						/>

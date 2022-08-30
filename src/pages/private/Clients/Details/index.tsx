@@ -1,24 +1,23 @@
-import { documentCPF, phoneNumber } from "../../../../utils/validators";
-import { DescriptionShorter } from "../../../../utils/description";
-import React, { useEffect, useState } from "react";
-import { useHistory } from "react-router-dom";
-import { Container } from "./styles";
-import { format } from "date-fns";
-import mockDetail from "./mock";
 import {
-	TableColumnType,
-	PageHeader,
-	Divider,
 	Button,
+	Col,
+	Divider,
+	Form,
 	Input,
+	PageHeader,
+	Row,
 	Space,
 	Table,
-	Form,
+	TableColumnType,
 	Tabs,
-	Col,
-	Row,
 	Tag,
 } from "antd";
+import { format } from "date-fns";
+import React, { useEffect, useState } from "react";
+import { useHistory } from "react-router-dom";
+import { documentCPF, phoneNumber } from "../../../../utils/validators";
+import mockDetail from "./mock";
+import { Container } from "./styles";
 const { TabPane } = Tabs;
 interface DetailsProps {}
 
@@ -48,30 +47,16 @@ export const Details: React.FC<DetailsProps> = () => {
 			width: 280,
 		},
 		{
-			key: "description",
-			title: "Descrição do produto",
-			dataIndex: "description",
-			render: (_, record) => {
-				return (
-					<DescriptionShorter
-						description={record.plan.description}
-						limit={36}
-					/>
-				);
-			},
-			width: 300,
-		},
-		{
 			key: "price",
 			title: "Preço",
 			dataIndex: "price",
 			render: (_, record) => {
-				return <>{record.plan.price + " R$"}</>;
+				return <>{"R$ " + record.plan.price}</>;
 			},
 		},
 		{
 			key: "start_date",
-			title: "Data de aquisição",
+			title: "Data de assinatura",
 			dataIndex: "start_date",
 			render: (_, record) => {
 				return <>{format(new Date(record.start_date), "dd/MM/yyyy")}</>;
@@ -116,7 +101,7 @@ export const Details: React.FC<DetailsProps> = () => {
 	}, [form]);
 
 	return (
-		<Container data-testid="container-el">
+		<Container aria-label="container-el">
 			<PageHeader title="Detalhes" onBack={() => history.goBack()}>
 				<Tabs defaultActiveKey="details">
 					<Tabs.TabPane tab="Dados gerais" key="details">
@@ -135,7 +120,7 @@ export const Details: React.FC<DetailsProps> = () => {
 									>
 										<Input
 											placeholder="Digite o nome do cliente"
-											data-testid="name-input-el"
+											aria-label="name-input-el"
 											disabled={!isEditing}
 										/>
 									</Form.Item>
@@ -148,7 +133,7 @@ export const Details: React.FC<DetailsProps> = () => {
 									>
 										<Input
 											placeholder="Digite o email do cliente"
-											data-testid="email-input-el"
+											aria-label="email-input-el"
 											disabled={!isEditing}
 										/>
 									</Form.Item>
@@ -161,7 +146,7 @@ export const Details: React.FC<DetailsProps> = () => {
 									>
 										<Input
 											placeholder="Digite o documento do cliente"
-											data-testid="document-input-el"
+											aria-label="document-input-el"
 											disabled={!isEditing}
 										/>
 									</Form.Item>
@@ -187,7 +172,7 @@ export const Details: React.FC<DetailsProps> = () => {
 								</Col>
 							</Row>
 							<Row justify="end">
-								<Col data-testid="container-actions-el">
+								<Col aria-label="container-actions-el">
 									{isEditing ? (
 										<Space>
 											<Button
@@ -219,7 +204,7 @@ export const Details: React.FC<DetailsProps> = () => {
 							pagination={tablePagination}
 							loading={tableLoading}
 							columns={tableCols}
-							data-testid="table-el"
+							aria-label="table-el"
 						/>
 					</TabPane>
 				</Tabs>

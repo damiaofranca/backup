@@ -204,7 +204,7 @@ export const Users: React.FC = (props) => {
 	}, [loadData, shouldReloadTable]);
 
 	return (
-		<Container data-testid="container-el">
+		<Container aria-label="container-el">
 			<AddUser
 				isVisible={isVisible}
 				onSubmit={() => {
@@ -252,7 +252,7 @@ export const Users: React.FC = (props) => {
 							onChange={onHandleTableChange}
 							pagination={tablePagination}
 							loading={tableLoading}
-							data-testid="table-el"
+							data-testid="table-users-el"
 							columns={tableCols}
 							dataSource={data}
 							size="middle"

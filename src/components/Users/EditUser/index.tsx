@@ -6,7 +6,7 @@ interface AddUserProps {
 	onCancel: () => void;
 	onSubmit: () => void;
 	isVisible: boolean;
-	user: any;
+	user: { name: string | null; email: string | null; id: string | null };
 }
 
 export const EditUser: React.FC<AddUserProps> = ({
@@ -91,7 +91,7 @@ export const EditUser: React.FC<AddUserProps> = ({
 				form={form}
 				name="control-hooks"
 				onFinish={onFinish}
-				data-testid="form-el"
+				data-testid="form-user-el"
 			>
 				<Form.Item
 					name="name"
@@ -100,7 +100,7 @@ export const EditUser: React.FC<AddUserProps> = ({
 				>
 					<Input
 						placeholder="Digite o nome do usuário"
-						data-testid="name-input-form"
+						aria-label="name-input-form"
 					/>
 				</Form.Item>
 				<Form.Item
@@ -110,7 +110,7 @@ export const EditUser: React.FC<AddUserProps> = ({
 				>
 					<Input
 						placeholder="Digite o email do usuário"
-						data-testid="email-input-form"
+						aria-label="email-input-form"
 					/>
 				</Form.Item>
 			</Form>

@@ -5,11 +5,11 @@ import "../../../utils/matchMedia";
 import Home from ".";
 
 test("should render all components", () => {
-	const { getByTestId } = render(
+	const { getByLabelText } = render(
 		<MemoryRouter>
 			<Home />
 		</MemoryRouter>
 	);
-	expect(getByTestId("container-el")).toBeInTheDocument();
-	expect(getByTestId("container-message-el")).toBeInTheDocument();
+	expect(getByLabelText("container-el")).toBeInTheDocument();
+	expect(getByLabelText("container-message-el")).toBeInTheDocument();
 });

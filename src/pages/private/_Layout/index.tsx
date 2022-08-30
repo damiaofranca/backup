@@ -7,23 +7,22 @@ import {
 	ProfileOutlined,
 	SmileOutlined,
 	UserOutlined,
-	InboxOutlined,
 } from "@ant-design/icons";
-import { Switch, useHistory, useLocation } from "react-router-dom";
-import { CheckPermArg, useAuth } from "../../../providers/Auth";
 import { Button, Col, Layout, Menu, Modal, Row } from "antd";
-import logoImage from "../../../assets/logo.svg";
-import { UserType } from "../../../utils/enums";
-import { Details } from "../Clients/Details";
-import Router from "../../../routes/route";
 import React, { useState } from "react";
-import { Partners } from "../Partners";
+import { Switch, useHistory, useLocation } from "react-router-dom";
+import logoImage from "../../../assets/logo.svg";
+import { CheckPermArg, useAuth } from "../../../providers/Auth";
+import Router from "../../../routes/route";
+import { UserType } from "../../../utils/enums";
 import { Clients } from "../Clients";
-import { Container } from "./styles";
-import { Leads } from "../Leads";
-import { Users } from "../Users";
+import { Details } from "../Clients/Details";
 import Home from "../Home";
+import { Leads } from "../Leads";
+import { Partners } from "../Partners";
 import { Products } from "../Products";
+import { Users } from "../Users";
+import { Container } from "./styles";
 
 const { Header, Content, Sider } = Layout;
 
@@ -58,7 +57,7 @@ const _Layout = () => {
 	};
 
 	return (
-		<Container data-testid={"container-el"}>
+		<Container aria-label="container-el">
 			<Container>
 				<Sider
 					trigger={null}
@@ -114,12 +113,12 @@ const _Layout = () => {
 							</Menu.Item>
 						)}
 
-						{buildMenu(
+						{/* {buildMenu(
 							UserType.Admin,
 							<Menu.Item key="products" icon={<InboxOutlined />}>
 								Produtos
 							</Menu.Item>
-						)}
+						)} */}
 					</Menu>
 				</Sider>
 				<Layout>

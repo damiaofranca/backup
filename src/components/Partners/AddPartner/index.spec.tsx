@@ -1,11 +1,30 @@
-import { render } from "@testing-library/react";
+import {
+	fireEvent,
+	getByLabelText,
+	render,
+	waitFor,
+} from "@testing-library/react";
 import { AddPartner } from ".";
 import "../../../utils/matchMedia";
 
-test("should render all components", () => {
-	const { getByTestId } = render(
+describe("render component", () => {
+	const { getByTestId, getByLabelText } = render(
 		<AddPartner onCancel={() => {}} onSubmit={() => {}} isVisible />
 	);
-	expect(getByTestId("name-input-el")).toBeInTheDocument();
-	expect(getByTestId("modal-el")).toBeInTheDocument();
+	const modalElement = getByTestId("modal-partner-el");
+	const nameInput: any = getByLabelText("name-input-el");
+	test("should render all components", () => {
+		expect(modalElement).toBeInTheDocument();
+		expect(nameInput).toBeInTheDocument();
+	});
+
+	test("should input form aceppt text as value", async () => {
+		fireEvent.change(nameInput, {
+			target: { value: "namePartner" },
+		});
+
+		await waitFor(() => {
+			expect(nameInput.value).toBe("namePartner");
+		});
+	});
 });

@@ -1,35 +1,38 @@
-import { Button, Input, notification } from "antd";
+import { Button, Form, Input, notification, Typography } from "antd";
 import { useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import api from "../../../api";
-import logoImage from "../../../assets/logo-white.svg";
+import loginIMG from "../../../assets/login-img.png";
 
 import {
-	Actions,
-	Box,
 	Container,
-	ContainerLogo,
-	ContainerOrange,
-	Description,
-	Title,
+	ContainerCard,
+	ContainerFlex,
+	ContainerFlexSlotLeft,
+	ContainerFlexSlotRight,
+	ContainerFlexSlotRightTitles,
+	ContainerFloatable,
+	ContainerImage,
 } from "./styles";
+const { Title } = Typography;
 
 interface ResetPasswordProps {}
 
 export const ResetPassword: React.FC<ResetPasswordProps> = () => {
 	let history = useHistory();
 	let { token } = useParams<{ token: string }>();
-	const [password, setPassword] = useState<string>("");
+	const [form] = Form.useForm();
+	const [loading, setLoading] = useState(false);
 
 	const goToHome = () => {
-		return history.push("/");
+		return history.replace("/");
 	};
 
-	const resetPassword = async () => {
-		if (password.length > 8) {
+	const onFinish = async (values: any) => {
+		if (values.password === values.passwordAgain) {
 			try {
 				await api.post(`/api/crm/accounts/reset/password`, {
-					password,
+					password: values.password,
 					token,
 				});
 				notification.success({
@@ -42,41 +45,86 @@ export const ResetPassword: React.FC<ResetPasswordProps> = () => {
 			} catch (error) {
 				notification.error({
 					message:
-						"Ocorreu algum erro ao inserir a franquia. Tente novamente., " +
+						"Ocorreu algum erro ao tentar resetar a senha. Tente novamente., " +
 						error,
 				});
 			}
 		} else {
 			notification.warn({
-				message: "A senha deve ter pelo menos 8 dígitos.",
+				message: "As senhas não se coincidem.",
 			});
 		}
 	};
 
 	return (
 		<Container>
-			<ContainerOrange />
-			<Box>
-				<ContainerLogo>
-					<img src={logoImage} alt="Logo da Brisanet" />
-				</ContainerLogo>
-				<Title>Resetar senha</Title>
-				<Description>Por favor, insira uma nova senha.</Description>
-				<Input
-					style={{ height: "2.4rem", marginBottom: "1.6rem" }}
-					placeholder="Insira uma nova senha"
-					onChange={(evt) => {
-						setPassword(evt.target.value);
-					}}
-					value={password}
-				/>
-				<Actions>
-					<Button onClick={goToHome}>Cancelar</Button>
-					<Button type="primary" onClick={resetPassword}>
-						Resetar
-					</Button>
-				</Actions>
-			</Box>
+			<ContainerCard>
+				<ContainerFloatable>
+					<ContainerFlex>
+						<ContainerFlexSlotRight>
+							<ContainerFlexSlotRightTitles>
+								<Title className="primary-title" level={3}>
+									Resetar senha
+								</Title>
+								<Title level={5}>Insira uma nova</Title>
+							</ContainerFlexSlotRightTitles>
+							<ContainerImage>
+								<img src={loginIMG} alt="Agility CMS" />
+							</ContainerImage>
+						</ContainerFlexSlotRight>
+						<ContainerFlexSlotLeft>
+							<Title className="primary-title" level={2}>
+								Resetar
+							</Title>
+							<Form form={form} onFinish={onFinish}>
+								<Form.Item name="password" rules={[{ required: true, min: 8 }]}>
+									<Input.Password
+										size="large"
+										placeholder="Digite a senha"
+										aria-label="password-input"
+										disabled={loading}
+									/>
+								</Form.Item>
+								<Form.Item
+									name="passwordAgain"
+									rules={[{ required: true, min: 8 }]}
+								>
+									<Input.Password
+										size="large"
+										placeholder="Digite a senha novamente"
+										aria-label="password-again-input"
+										disabled={loading}
+									/>
+								</Form.Item>
+								<Form.Item>
+									<Button
+										type="primary"
+										htmlType="submit"
+										size="large"
+										style={{ display: "block", width: "100%" }}
+										disabled={loading}
+										loading={loading}
+										aria-label="submit-button"
+										data-testid="submit-button"
+									>
+										Resetar
+									</Button>
+								</Form.Item>
+								<Form.Item>
+									<Button
+										onClick={goToHome}
+										size="large"
+										style={{ display: "block", width: "100%" }}
+										data-testid="cancel-button"
+									>
+										Cancelar
+									</Button>
+								</Form.Item>
+							</Form>
+						</ContainerFlexSlotLeft>
+					</ContainerFlex>
+				</ContainerFloatable>
+			</ContainerCard>
 		</Container>
 	);
 };

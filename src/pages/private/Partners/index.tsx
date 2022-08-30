@@ -88,7 +88,7 @@ export const Partners: React.FC = (props) => {
 	}, [loadData, shouldReloadTable]);
 
 	return (
-		<Container data-testid="container-el">
+		<Container aria-label="container-el">
 			<PageHeader
 				title="Parceiros"
 				subTitle=""
@@ -105,6 +105,7 @@ export const Partners: React.FC = (props) => {
 						type="primary"
 						icon={<PlusOutlined />}
 						onClick={() => setIsVisible(true)}
+						data-testid="new-partner-el"
 					>
 						Novo
 					</Button>,
@@ -114,7 +115,7 @@ export const Partners: React.FC = (props) => {
 					<Col md={24}>
 						<Table
 							size="middle"
-							data-testid="table-el"
+							data-testid="table-partners-el"
 							rowKey={(record: any) => record.value}
 							dataSource={data}
 							columns={tableCols}
@@ -126,6 +127,7 @@ export const Partners: React.FC = (props) => {
 				</Row>
 			</PageHeader>
 			<AddPartner
+				data-testid="modal-add-partner"
 				isVisible={isVisible}
 				onSubmit={() => {
 					setIsVisible(false);

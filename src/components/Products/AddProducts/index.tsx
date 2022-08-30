@@ -48,7 +48,7 @@ export const AddProduct: React.FC<AddProductProps> = ({
 			title="Adicionar Produto"
 			closable={false}
 			maskClosable={false}
-			data-testid="modal-el"
+			data-testid="modal-product-el"
 			okText="Adicionar"
 			okButtonProps={{
 				htmlType: "submit",
@@ -78,7 +78,7 @@ export const AddProduct: React.FC<AddProductProps> = ({
 				form={form}
 				name="control-hooks"
 				onFinish={onFinish}
-				data-testid="form-element"
+				aria-label="form-el"
 			>
 				<Form.Item
 					name="name"
@@ -87,7 +87,7 @@ export const AddProduct: React.FC<AddProductProps> = ({
 				>
 					<Input
 						placeholder="Digite o nome do produto"
-						data-testid="name-input-el"
+						aria-label="name-input-el"
 					/>
 				</Form.Item>
 				<Form.Item
@@ -97,7 +97,7 @@ export const AddProduct: React.FC<AddProductProps> = ({
 				>
 					<Input
 						placeholder="Digite a descrição do produto"
-						data-testid="description-input-el"
+						aria-label="description-input-el"
 					/>
 				</Form.Item>
 				<Form.Item
@@ -108,7 +108,7 @@ export const AddProduct: React.FC<AddProductProps> = ({
 					<Input
 						type={"number"}
 						placeholder="Digite o período de testes"
-						data-testid="grace_period-input-el"
+						aria-label="grace-period-input-el"
 					/>
 				</Form.Item>
 
@@ -120,7 +120,7 @@ export const AddProduct: React.FC<AddProductProps> = ({
 					<Input
 						type={"number"}
 						placeholder="Digite a quantidade de dispositivos que terão acesso ao produto"
-						data-testid="number_of_devices-input-el"
+						aria-label="number-of-devices-el"
 					/>
 				</Form.Item>
 				<Form.Item
@@ -131,11 +131,11 @@ export const AddProduct: React.FC<AddProductProps> = ({
 					<Input
 						type={"number"}
 						placeholder="Digite o preço do produto"
-						data-testid="price-input-el"
+						aria-label="price-el"
 					/>
 				</Form.Item>
 				<Form.Item name="is_active" valuePropName="checked">
-					<Checkbox data-testid="product-active-input-el">
+					<Checkbox aria-label="product-active-check-el">
 						Produto ativo ?
 					</Checkbox>
 				</Form.Item>

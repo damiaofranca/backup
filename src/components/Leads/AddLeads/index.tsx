@@ -79,7 +79,7 @@ export const AddLeads: React.FC<AddPartnerProps> = ({
 				form={form}
 				name="control-hooks"
 				onFinish={onFinish}
-				data-testid="form-element"
+				data-testid="form-leads-element"
 			>
 				<Form.Item
 					name="name"
@@ -88,7 +88,7 @@ export const AddLeads: React.FC<AddPartnerProps> = ({
 				>
 					<Input
 						placeholder="Digite o nome do lead"
-						data-testid="name-input-el"
+						aria-label="name-input-el"
 					/>
 				</Form.Item>
 				<Form.Item
@@ -98,7 +98,7 @@ export const AddLeads: React.FC<AddPartnerProps> = ({
 				>
 					<Input
 						placeholder="Digite o email do lead"
-						data-testid="email-input-el"
+						aria-label="email-input-el"
 					/>
 				</Form.Item>
 				<Form.Item
@@ -108,7 +108,7 @@ export const AddLeads: React.FC<AddPartnerProps> = ({
 				>
 					<Input
 						placeholder="Digite o UTM da campanha"
-						data-testid="campaign-input-el"
+						aria-label="campaign-input-el"
 					/>
 				</Form.Item>
 				<Form.Item
@@ -118,7 +118,7 @@ export const AddLeads: React.FC<AddPartnerProps> = ({
 				>
 					<Input
 						placeholder="Digite o UTM médio"
-						data-testid="medium-input-el"
+						aria-label="medium-input-el"
 					/>
 				</Form.Item>
 				<Form.Item
@@ -128,7 +128,7 @@ export const AddLeads: React.FC<AddPartnerProps> = ({
 				>
 					<Input
 						placeholder="Digite o UTM da fonte"
-						data-testid="source-input-el"
+						aria-label="source-input-el"
 					/>
 				</Form.Item>
 				<Form.Item
@@ -138,7 +138,7 @@ export const AddLeads: React.FC<AddPartnerProps> = ({
 				>
 					<Input
 						placeholder="Digite o UTM do termo"
-						data-testid="term-input-el"
+						aria-label="term-input-el"
 					/>
 				</Form.Item>
 			</Form>

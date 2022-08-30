@@ -5,13 +5,13 @@ import "../../../utils/matchMedia";
 import { Users } from ".";
 
 test("should render all components", () => {
-	const { getByTestId } = render(
+	const { getByTestId, getByLabelText } = render(
 		<MemoryRouter>
 			<Users />
 		</MemoryRouter>
 	);
-	expect(getByTestId("container-el")).toBeInTheDocument();
-	expect(getByTestId("table-el")).toBeInTheDocument();
+	expect(getByLabelText("container-el")).toBeInTheDocument();
+	expect(getByTestId("table-users-el")).toBeInTheDocument();
 	expect(getByTestId("load-data-el")).toBeInTheDocument();
 	expect(getByTestId("new-data-el")).toBeInTheDocument();
 });

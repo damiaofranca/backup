@@ -77,7 +77,7 @@ export const AddUser: React.FC<AddUserProps> = ({
 				form={form}
 				name="control-hooks"
 				onFinish={onFinish}
-				data-testid="form-el"
+				data-testid="form-user-el"
 			>
 				<Form.Item
 					name="name"
@@ -86,7 +86,7 @@ export const AddUser: React.FC<AddUserProps> = ({
 				>
 					<Input
 						placeholder="Digite o nome do usuário"
-						data-testid="name-input-form"
+						aria-label="name-input-form"
 					/>
 				</Form.Item>
 				<Form.Item
@@ -96,7 +96,7 @@ export const AddUser: React.FC<AddUserProps> = ({
 				>
 					<Input
 						placeholder="Digite o email do usuário"
-						data-testid="email-input-form"
+						aria-label="email-input-form"
 					/>
 				</Form.Item>
 				<Form.Item
@@ -106,7 +106,7 @@ export const AddUser: React.FC<AddUserProps> = ({
 				>
 					<Input
 						placeholder="Digite a senha do usuário"
-						data-testid="password-input-form"
+						aria-label="password-input-form"
 					/>
 				</Form.Item>
 			</Form>

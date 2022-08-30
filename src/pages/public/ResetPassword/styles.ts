@@ -1,55 +1,86 @@
 import styled from "styled-components";
 
 export const Container = styled.div`
-	display: flex;
-	min-height: 100vh;
-	position: relative;
-	align-items: center;
-	justify-content: center;
-	background-color: #f0f2f5;
-`;
-
-export const ContainerOrange = styled.div`
-	top: 0%;
-	width: 100%;
-	height: 50vh;
 	position: absolute;
-	background-color: #f56e28;
-`;
+	display: block;
+	width: 100vw;
+	height: 100vh;
+	background: #083d93;
 
-export const Box = styled.div`
-	width: 28%;
-	z-index: 1;
-	padding: 33px;
-	border-radius: 6px;
-	background-color: #083d93;
-`;
-
-export const ContainerLogo = styled.div`
-	flex: 1;
-	display: flex;
-	margin-bottom: 2rem;
-	justify-content: center;
-`;
-
-export const Title = styled.h1`
-	color: #ffffff;
-	font-weight: 700;
-	text-align: center;
-`;
-
-export const Description = styled.p`
-	color: #ffffff;
-	text-align: center;
-	margin-bottom: 3rem;
-`;
-
-export const Actions = styled.div`
-	display: flex;
-	margin-top: 1.5rem;
-	justify-content: flex-end;
-
-	& > button:last-child {
-		margin-left: 0.5rem;
+	.primary-title {
+		color: #083d93;
 	}
+`;
+
+export const ContainerCard = styled.div`
+	position: relative;
+	display: block;
+`;
+
+export const ContainerFloatable = styled.div`
+	position: absolute;
+	display: block;
+	left: 50%;
+	top: 10vh;
+	transform: translateX(-50%);
+	background: #ffffff;
+	border-radius: 6px;
+	min-height: 100px;
+	width: 65vw;
+	padding: 33px 0 33px 33px;
+
+	// xl
+	@media (max-width: 1200px) {
+		width: 80vw;
+	}
+
+	@media (min-width: 1600px) {
+		width: 60vw;
+	}
+
+	@media (min-width: 1900px) {
+		width: 40vw;
+	}
+`;
+
+export const ContainerFlex = styled.div`
+	display: flex;
+	width: 100%;
+`;
+
+export const ContainerFlexSlotRight = styled.div`
+	display: flex;
+	justify-content: space-between;
+	flex-direction: column;
+	border-right: 1px solid #adb5bd;
+	padding-right: 44px;
+	width: 50%;
+	padding-top: 40px;
+`;
+
+export const ContainerFlexSlotRightTitles = styled.div`
+	padding-left: 50px;
+`;
+
+export const ContainerFlexSlotLeft = styled.div`
+	display: block;
+	width: 50%;
+	padding-top: 60px;
+	padding-left: 60px;
+	padding-right: 60px;
+`;
+
+export const ContainerImage = styled.div`
+	margin-top: 60px;
+	text-align: center;
+
+	img {
+		margin-bottom: -33px;
+
+		width: 100%;
+	}
+`;
+
+export const TextFieldWrapper = styled.div<{ isLast?: boolean }>`
+	margin-bottom: ${(p) => (p.isLast ? 33 : 23)}px;
 `;

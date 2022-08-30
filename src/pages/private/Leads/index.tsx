@@ -147,7 +147,7 @@ export const Leads: React.FC = (props) => {
 	}, [loadData, shouldReloadTable]);
 
 	return (
-		<Container data-testid="container-el">
+		<Container aria-label="container-el">
 			<PageHeader
 				title="Leads"
 				subTitle=""
@@ -177,7 +177,7 @@ export const Leads: React.FC = (props) => {
 							rowKey={(record: any) => record.id}
 							dataSource={data}
 							columns={tableCols}
-							data-testid="table-el"
+							aria-label="table-el"
 							loading={tableLoading}
 							pagination={tablePagination}
 							onChange={onHandleTableChange}

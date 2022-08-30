@@ -1,15 +1,23 @@
-import { render } from "@testing-library/react";
+import { fireEvent, render } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import "@testing-library/jest-dom";
 import "../../../utils/matchMedia";
 import { Partners } from ".";
 
-test("should render all components", () => {
-	const { getByTestId } = render(
+describe("component test partners", () => {
+	const { getByTestId, getByLabelText } = render(
 		<MemoryRouter>
 			<Partners />
 		</MemoryRouter>
 	);
-	expect(getByTestId("container-el")).toBeInTheDocument();
-	expect(getByTestId("table-el")).toBeInTheDocument();
+
+	const containerEl = getByLabelText("container-el");
+	const tableEl = getByTestId("table-partners-el");
+	const newPartnerEl = getByTestId("new-partner-el");
+
+	test("should render all components", () => {
+		expect(containerEl).toBeInTheDocument();
+		expect(tableEl).toBeInTheDocument();
+		expect(newPartnerEl).toBeInTheDocument();
+	});
 });

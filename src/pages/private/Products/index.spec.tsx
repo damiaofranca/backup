@@ -11,5 +11,5 @@ test("should render all components", () => {
 		</MemoryRouter>
 	);
 	expect(getByTestId("container-el")).toBeInTheDocument();
-	expect(getByTestId("table-el")).toBeInTheDocument();
+	expect(getByTestId("table-product-el")).toBeInTheDocument();
 });

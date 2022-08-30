@@ -75,6 +75,7 @@ const Login: React.FC = () => {
 										size="large"
 										type={"email"}
 										placeholder="Digite o e-mail"
+										aria-label="email-input"
 										disabled={loading}
 									/>
 								</Form.Item>
@@ -82,6 +83,7 @@ const Login: React.FC = () => {
 									<Input.Password
 										size="large"
 										placeholder="Digite a senha"
+										aria-label="password-input"
 										disabled={loading}
 									/>
 								</Form.Item>
@@ -93,6 +95,7 @@ const Login: React.FC = () => {
 										style={{ display: "block", width: "100%" }}
 										disabled={loading}
 										loading={loading}
+										aria-label="submit-button"
 									>
 										Entrar
 									</Button>

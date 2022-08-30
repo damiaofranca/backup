@@ -50,7 +50,7 @@ export const AddPartner: React.FC<AddPartnerProps> = ({
 			closable={false}
 			maskClosable={false}
 			okText="Adicionar"
-			data-testid="modal-el"
+			data-testid="modal-partner-el"
 			okButtonProps={{
 				htmlType: "submit",
 				disabled: loading,
@@ -87,7 +87,7 @@ export const AddPartner: React.FC<AddPartnerProps> = ({
 				>
 					<Input
 						placeholder="Digite o nome do parceiro"
-						data-testid="name-input-el"
+						aria-label="name-input-el"
 					/>
 				</Form.Item>
 			</Form>

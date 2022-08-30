@@ -136,7 +136,7 @@ export const Products: React.FC<ProductsProps> = () => {
 							pagination={tablePagination}
 							dataSource={productMock}
 							loading={tableLoading}
-							data-testid="table-el"
+							data-testid="table-product-el"
 							columns={tableCols}
 							size="middle"
 						/>
