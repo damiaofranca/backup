@@ -1,5 +1,6 @@
-import { Checkbox, Form, Input, Modal } from "antd";
+import { Checkbox, Form, Input, Modal, notification } from "antd";
 import React, { useState } from "react";
+import api from "../../../api";
 
 interface AddProductProps {
 	onCancel: () => void;
@@ -16,26 +17,30 @@ export const AddProduct: React.FC<AddProductProps> = ({
 	const [loading, setLoading] = useState(false);
 
 	const onFinish = async (values: any) => {
-		// setLoading(true);
-		// try {
-		// 	await api.post(`/api/product`, values);
+		setLoading(true);
+		try {
+			await api.post(`/api/crm/products`, {
+				name: values.name,
+				// "is_active": true,
+				description: values.description,
+			});
 
-		// 	notification.success({
-		// 		message: "Produto inserido com sucesso",
-		// 	});
+			notification.success({
+				message: "Produto inserido com sucesso",
+			});
 
-		onReset();
-		onSubmit && onSubmit();
+			onReset();
+			onCancel();
+			onSubmit && onSubmit();
 
-		setLoading(false);
-		// } catch (error) {
-		// 	notification.error({
-		// 		message:
-		// 			"Ocorreu algum erro ao criar o produto. Tente novamente., " +
-		// 			error,
-		// 	});
-		// 	setLoading(false);
-		// }
+			setLoading(false);
+		} catch (error) {
+			notification.error({
+				message:
+					"Ocorreu algum erro ao criar o produto. Tente novamente., " + error,
+			});
+			setLoading(false);
+		}
 	};
 
 	const onReset = () => {
@@ -100,40 +105,7 @@ export const AddProduct: React.FC<AddProductProps> = ({
 						aria-label="description-input-el"
 					/>
 				</Form.Item>
-				<Form.Item
-					name="grace_period"
-					label="Período de testes"
-					rules={[{ required: true, min: 1 }]}
-				>
-					<Input
-						type={"number"}
-						placeholder="Digite o período de testes"
-						aria-label="grace-period-input-el"
-					/>
-				</Form.Item>
 
-				<Form.Item
-					name="number_of_devices"
-					label="Número de dispositivos"
-					rules={[{ required: true, min: 1 }]}
-				>
-					<Input
-						type={"number"}
-						placeholder="Digite a quantidade de dispositivos que terão acesso ao produto"
-						aria-label="number-of-devices-el"
-					/>
-				</Form.Item>
-				<Form.Item
-					name="price"
-					label="Preço do produto"
-					rules={[{ required: true, min: 1 }]}
-				>
-					<Input
-						type={"number"}
-						placeholder="Digite o preço do produto"
-						aria-label="price-el"
-					/>
-				</Form.Item>
 				<Form.Item name="is_active" valuePropName="checked">
 					<Checkbox aria-label="product-active-check-el">
 						Produto ativo ?

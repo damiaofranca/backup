@@ -3,8 +3,7 @@ import { PlusOutlined, ReloadOutlined } from "@ant-design/icons";
 import { DescriptionShorter } from "../../../utils/description";
 import { Container } from "./styles";
 import { format } from "date-fns";
-import { useState } from "react";
-import productMock from "./mock";
+import { useCallback, useEffect, useState } from "react";
 import {
 	TableColumnType,
 	PageHeader,
@@ -13,18 +12,81 @@ import {
 	Col,
 	Row,
 	Tag,
+	notification,
 } from "antd";
+import api from "../../../api";
+import { mock } from "./model";
+import { Link } from "react-router-dom";
 
 interface ProductsProps {}
 
 export const Products: React.FC<ProductsProps> = () => {
+	const [data, setData] = useState([]);
 	const [tableLoading, setTableLoading] = useState(false);
 	const [isVisibleModal, setIsVisibleModal] = useState(false);
+	const [shouldReloadTable, setShouldReloadTable] = useState(false);
+	const onHandleReloadData = () => setShouldReloadTable(!shouldReloadTable);
 	const [tablePagination, setTablePagination] = useState({
 		current: 1,
 		pageSize: 10,
 		showSizeChanger: true,
 	});
+
+	const loadData = useCallback(async (params: any) => {
+		setTableLoading(true);
+		const {
+			start_date,
+			sortOrder,
+			sortField,
+			end_date,
+			pageSize,
+			current,
+			filters,
+		} = params;
+		try {
+			const { data } = await api.get("/api/crm/products", {
+				params: {
+					per_page: pageSize,
+					page: current,
+				},
+			});
+			return data;
+		} catch (error) {
+			throw new Error("Erro ao carregar dados! " + error);
+		} finally {
+			setTableLoading(false);
+		}
+	}, []);
+
+	const onHandleTableChange = (pagination: any, filters: any, sorter: any) => {
+		if (!pagination) return;
+		let newFilters: any = {};
+		for (const key in filters) {
+			if (filters[key] === null) continue;
+			const value = filters[key];
+			if (value.length > 1) {
+				newFilters[key] = value;
+				continue;
+			}
+			newFilters[key] = value[0];
+		}
+
+		loadData({
+			sortField: sorter.field,
+			sortOrder: sorter.order,
+			...pagination,
+			filters: newFilters,
+		})
+			.then((response) => {
+				setTablePagination((old) => ({
+					...old,
+					...pagination,
+					total: response.total,
+				}));
+				setData(response.data);
+			})
+			.catch(() => notification.error({ message: "Erro ao carregar dados!" }));
+	};
 
 	const tableCols: TableColumnType<any>[] = [
 		{
@@ -48,30 +110,6 @@ export const Products: React.FC<ProductsProps> = () => {
 				);
 			},
 			width: 300,
-		},
-		{
-			key: "price",
-			title: "Preço",
-			dataIndex: "price",
-			render: (_: any, record) => {
-				return <>{record.price + " R$"}</>;
-			},
-		},
-		{
-			key: "grace_period",
-			title: "Periodo de teste",
-			dataIndex: "grace_period",
-			render: (_: any, record) => {
-				return <>{record.grace_period + " dias"}</>;
-			},
-		},
-		{
-			key: "number_of_devices",
-			title: "Número de dispositivo",
-			dataIndex: "number_of_devices",
-			render: (_: any, record) => {
-				return <>{record.number_of_devices}</>;
-			},
 		},
 		{
 			key: "created_at",
@@ -101,14 +139,27 @@ export const Products: React.FC<ProductsProps> = () => {
 			render: (_, record) => {
 				return (
 					<>
-						<Button key="bt-view" size="small">
-							Editar
-						</Button>
+						<Link to={`/products/${record.id}`}>
+							<Button key="bt-view" size="small">
+								Detalhes
+							</Button>
+						</Link>
 					</>
 				);
 			},
 		},
 	];
+
+	useEffect(() => {
+		// let didCancel = false;
+		// loadData({})
+		// 	.then((response) => {
+		// 		console.log(response);
+		// 		!didCancel && setData(response.data);
+		// 		setTablePagination((old) => ({ ...old, total: response.total }));
+		// 	})
+		// 	.catch(() => notification.error({ message: "Erro ao carregar dados!" }));
+	}, [loadData, shouldReloadTable]);
 
 	return (
 		<Container data-testid="container-el">
@@ -116,7 +167,11 @@ export const Products: React.FC<ProductsProps> = () => {
 				title="Produtos"
 				subTitle=""
 				extra={[
-					<Button key="bt-ds-reload" icon={<ReloadOutlined />}>
+					<Button
+						key="bt-ds-reload"
+						icon={<ReloadOutlined />}
+						onClick={onHandleReloadData}
+					>
 						Recarregar dados
 					</Button>,
 					<Button
@@ -133,19 +188,19 @@ export const Products: React.FC<ProductsProps> = () => {
 					<Col md={24}>
 						<Table
 							rowKey={(record: any) => record.id}
-							pagination={tablePagination}
-							dataSource={productMock}
-							loading={tableLoading}
 							data-testid="table-product-el"
+							pagination={tablePagination}
+							loading={tableLoading}
 							columns={tableCols}
+							dataSource={mock}
 							size="middle"
 						/>
 					</Col>
 				</Row>
 			</PageHeader>
 			<AddProduct
-				isVisible={isVisibleModal}
 				onCancel={() => setIsVisibleModal(false)}
+				isVisible={isVisibleModal}
 				onSubmit={() => {}}
 			/>
 		</Container>

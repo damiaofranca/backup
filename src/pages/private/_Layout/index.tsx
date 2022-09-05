@@ -7,6 +7,7 @@ import {
 	ProfileOutlined,
 	SmileOutlined,
 	UserOutlined,
+	InboxOutlined,
 } from "@ant-design/icons";
 import { Button, Col, Layout, Menu, Modal, Row } from "antd";
 import React, { useState } from "react";
@@ -21,6 +22,7 @@ import Home from "../Home";
 import { Leads } from "../Leads";
 import { Partners } from "../Partners";
 import { Products } from "../Products";
+import { DetailsProduct } from "../Products/Details";
 import { Users } from "../Users";
 import { Container } from "./styles";
 
@@ -113,12 +115,12 @@ const _Layout = () => {
 							</Menu.Item>
 						)}
 
-						{/* {buildMenu(
+						{buildMenu(
 							UserType.Admin,
 							<Menu.Item key="products" icon={<InboxOutlined />}>
 								Produtos
 							</Menu.Item>
-						)} */}
+						)}
 					</Menu>
 				</Sider>
 				<Layout>
@@ -192,44 +194,51 @@ const _Layout = () => {
 							<Router isPrivate path="/" exact component={Home} />
 							<Router
 								isPrivate
-								userType={UserType.Admin || UserType.Franchisee}
 								path="/partners"
 								component={Partners}
+								userType={UserType.Admin || UserType.Franchisee}
 							/>
 
 							<Router
 								isPrivate
-								userType={UserType.Admin || UserType.Franchisee}
 								path="/leads"
 								component={Leads}
+								userType={UserType.Admin || UserType.Franchisee}
 							/>
 							<Router
 								isPrivate
-								userType={UserType.Admin || UserType.Franchisee}
 								path="/users"
 								component={Users}
+								userType={UserType.Admin || UserType.Franchisee}
 							/>
 
 							<Router
 								isPrivate
 								exact
-								userType={UserType.Admin || UserType.Franchisee}
 								path="/clients"
 								component={Clients}
+								userType={UserType.Admin || UserType.Franchisee}
 							/>
 
 							<Router
 								isPrivate
+								component={Details}
 								userType={UserType.Admin}
 								path="/clients/:clientId"
-								component={Details}
 							/>
 
 							<Router
+								exact
 								isPrivate
-								userType={UserType.Admin}
 								path="/products"
 								component={Products}
+								userType={UserType.Admin}
+							/>
+							<Router
+								isPrivate
+								userType={UserType.Admin}
+								path="/products/:productId"
+								component={DetailsProduct}
 							/>
 						</Switch>
 					</Content>
