@@ -1,23 +1,33 @@
 import { notification } from "antd";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { PropsWithChildren, useCallback, useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import api from "../../api";
 import { useBreadcrumbs } from "../Breadcrumbs";
 import Context from "./context";
+import { LoggedUser, StateUser } from "./props";
 
 const PERSIST_KEY = "@cpcmsa";
 
-interface ProviderProps {
-  children: React.ReactNode;
-}
+const CLEAN_UP_USER: LoggedUser = {
+  admin: false,
+  email: "",
+  token: "",
+  perms: [],
+  name: "",
+};
 
-const Provider: React.FC<ProviderProps> = ({ children }) => {
+interface ProviderProps {}
+
+const SAVED_STATE = JSON.parse(localStorage.getItem(PERSIST_KEY) as string);
+
+const Provider: React.FC<PropsWithChildren<ProviderProps>> = ({ children }) => {
   const history = useHistory();
+
   const { setBreadcrumbs } = useBreadcrumbs();
-  const savedState = JSON.parse(localStorage.getItem(PERSIST_KEY) as string);
-  const [state, setState] = useState({
+
+  const [state, setState] = useState<StateUser>({
     isAuthenticated: false,
-    ...savedState,
+    ...SAVED_STATE,
   });
 
   const login = useCallback(
@@ -47,6 +57,7 @@ const Provider: React.FC<ProviderProps> = ({ children }) => {
     localStorage.removeItem(PERSIST_KEY);
     api.defaults.headers["Authorization"] = undefined;
     setState({
+      ...CLEAN_UP_USER,
       isAuthenticated: false,
     });
 
@@ -55,20 +66,12 @@ const Provider: React.FC<ProviderProps> = ({ children }) => {
     }
   }, [history, setBreadcrumbs]);
 
-  const userTypeIs = useCallback(() => {
-    return state.user.is_admin as boolean;
+  const userIsAdmin = useCallback(() => {
+    return !!state.admin;
   }, [state]);
 
-  const checkPermission = useCallback(
-    (userType: number) => {
-      if (userTypeIs()) return true;
-      return userType === 2 ? true : false;
-    },
-    [userTypeIs]
-  );
-
-  if (savedState && savedState["access_token"]) {
-    api.defaults.headers["Authorization"] = `Bearer ${savedState["access_token"]}`;
+  if (SAVED_STATE && SAVED_STATE["access_token"]) {
+    api.defaults.headers["Authorization"] = `Bearer ${SAVED_STATE["access_token"]}`;
     api.interceptors.response.use(
       (response: any) => {
         return response;
@@ -146,8 +149,7 @@ const Provider: React.FC<ProviderProps> = ({ children }) => {
         ...state,
         login,
         logout,
-        userTypeIs,
-        checkPermission,
+        userIsAdmin,
       }}
     >
       {children}

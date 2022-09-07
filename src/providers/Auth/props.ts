@@ -1,15 +1,17 @@
-import { UserType } from "../../utils/enums";
+export interface LoggedUser {
+  admin: boolean;
+  email: string;
+  name: string;
+  perms: string[];
+  token: string;
+}
 
-export type CheckPermArg = UserType | UserType[];
+export interface StateUser extends LoggedUser {
+  isAuthenticated: boolean;
+}
 
-export interface AuthProps {
-	user_type: UserType;
-	name: string;
-	email: string;
-	token: string;
-	isAuthenticated: boolean;
-	login: (email: string, password: string) => Promise<void>;
-	logout: () => void;
-	checkPermission: (userType: CheckPermArg) => boolean;
-	userTypeIs: () => boolean;
+export interface AuthProps extends StateUser {
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => void;
+  userIsAdmin: () => boolean;
 }
