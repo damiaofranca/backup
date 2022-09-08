@@ -1,28 +1,35 @@
-import { Form, Input, Modal, notification } from "antd";
-import Checkbox from "antd/lib/checkbox/Checkbox";
+import { Form, Input, InputNumber, Modal, notification } from "antd";
 import { useState } from "react";
 import api from "../../../../api";
 
-interface AddPartnerProps {
+interface AddPlanProps
+{
 	onCancel: () => void;
 	onSubmit: () => void;
 	isVisible: boolean;
-	idPlan: string;
+	productId: string;
 }
 
-export const AddPlan: React.FC<AddPartnerProps> = ({
+const AddPlan: React.FC<AddPlanProps> = ({
 	onCancel,
 	onSubmit,
 	isVisible,
-	idPlan,
-}) => {
+	productId,
+}) =>
+{
 	const [form] = Form.useForm();
 	const [loading, setLoading] = useState(false);
 
-	const onFinish = async (values: any) => {
+	const onFinish = async (values: any) =>
+	{
 		setLoading(true);
-		try {
-			await api.post(`/api/crm/plans`, { ...values, product_id: idPlan });
+		try
+		{
+			await api.post(`/crm/offer`, {
+				external_service_id: 1,
+				...values,
+				grace_period: `${ values.grace_period }`
+			});
 
 			notification.success({
 				message: "Plano inserido com sucesso",
@@ -32,7 +39,8 @@ export const AddPlan: React.FC<AddPartnerProps> = ({
 			onSubmit && onSubmit();
 
 			setLoading(false);
-		} catch (error) {
+		} catch (error)
+		{
 			notification.error({
 				message:
 					"Ocorreu algum erro ao inserir o plano. Tente novamente., " + error,
@@ -41,52 +49,60 @@ export const AddPlan: React.FC<AddPartnerProps> = ({
 		}
 	};
 
-	const onReset = () => {
+	const onReset = () =>
+	{
 		form.resetFields();
 	};
 
+	console.log(form.getFieldsValue());
+
+
 	return (
 		<Modal
-			visible={isVisible}
+			visible={ isVisible }
 			title="Adicionar Plano"
-			closable={false}
-			maskClosable={false}
+			closable={ false }
+			maskClosable={ false }
 			okText="Adicionar"
 			data-testid="modal-plan-product-el"
-			okButtonProps={{
+			okButtonProps={ {
 				htmlType: "submit",
 				disabled: loading,
 				loading: loading,
-			}}
-			cancelButtonProps={{
+			} }
+			cancelButtonProps={ {
 				disabled: loading,
-			}}
-			onOk={() => {
+			} }
+			onOk={ () =>
+			{
 				form
 					.validateFields()
-					.then(() => {
+					.then(() =>
+					{
 						form.submit();
 					})
-					.catch((info) => {
+					.catch((info) =>
+					{
 						console.log("Validate Failed: ", info);
 					});
-			}}
-			onCancel={() => {
+			} }
+			onCancel={ () =>
+			{
 				onReset();
 				onCancel && onCancel();
-			}}
+			} }
 		>
 			<Form
 				layout="vertical"
-				form={form}
+				form={ form }
 				name="control-hooks"
 				aria-label="container-el"
-				onFinish={onFinish}
+				onFinish={ onFinish }
 			>
 				<Form.Item
 					name="name"
 					label="Nome"
-					rules={[{ required: true, max: 512, min: 2 }]}
+					rules={ [{ required: true, max: 512, min: 2 }] }
 				>
 					<Input
 						placeholder="Digite o nome do plano"
@@ -94,58 +110,46 @@ export const AddPlan: React.FC<AddPartnerProps> = ({
 					/>
 				</Form.Item>
 				<Form.Item
-					name="description"
-					label="Descrição"
-					rules={[{ required: true, max: 512, min: 2 }]}
-				>
-					<Input
-						placeholder="Digite a descrição do plano"
-						aria-label="description-input-el"
-					/>
-				</Form.Item>
-				<Form.Item
 					name="price"
 					label="Preço"
-					rules={[{ required: true, max: 512, min: 1 }]}
+					rules={ [{ required: true }] }
 				>
-					<Input
-						type={"number"}
+					<InputNumber
+						className="w-f"
 						placeholder="Digite o preço do plano"
 						aria-label="price-input-el"
+						min={ 0 }
 					/>
 				</Form.Item>
 				<Form.Item
 					name="grace_period"
-					label="Período de testes"
-					rules={[{ required: true, max: 512, min: 1 }]}
+					label="Período de testes(dias)"
+					rules={ [] }
 				>
-					<Input
-						type={"number"}
+					<InputNumber
+						className="w-f"
 						placeholder="Digite o período de teste"
 						aria-label="grace-period-input-el"
+						formatter={ (value: any) => `${ value ? Math.floor(+value) : `0` }` }
+						parser={ value => value ? value : 0 as any }
+						min={ 0 }
+						max={ 365 }
 					/>
 				</Form.Item>
 				<Form.Item
-					name="number_of_devices"
-					label="Numéro de dispositivos"
-					rules={[{ required: true, max: 512, min: 1 }]}
+					name="description"
+					label="Descrição"
+					rules={ [{ max: 512, min: 0 }] }
 				>
-					<Input
-						type={"number"}
-						placeholder="Digite o aceito de dispositivos"
-						aria-label="number-of-devices-input-el"
+					<Input.TextArea
+						placeholder="Digite a descrição do plano"
+						aria-label="description-input-el"
+						rows={ 4 }
 					/>
-				</Form.Item>
-				<Form.Item
-					name="is_active"
-					valuePropName="checked"
-					style={{ margin: 0 }}
-				>
-					<Checkbox aria-label="product-active-check-el">
-						Produto ativo ?
-					</Checkbox>
 				</Form.Item>
 			</Form>
-		</Modal>
+		</Modal >
 	);
 };
+
+export default AddPlan;

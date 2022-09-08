@@ -21,7 +21,7 @@ import { Container } from "./styles";
 const { TabPane } = Tabs;
 interface DetailsProps {}
 
-export const Details: React.FC<DetailsProps> = () => {
+const ClientDetails: React.FC<DetailsProps> = () => {
 	const history = useHistory();
 	const [form] = Form.useForm();
 	const [data, setData] = useState([]);
@@ -212,3 +212,5 @@ export const Details: React.FC<DetailsProps> = () => {
 		</Container>
 	);
 };
+
+export default ClientDetails;

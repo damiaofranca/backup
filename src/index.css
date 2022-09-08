@@ -55,3 +55,7 @@ ul {
   user-select   : none;
   pointer-events: none;
 }
+
+.w-f {
+  width: 100% !important;
+}

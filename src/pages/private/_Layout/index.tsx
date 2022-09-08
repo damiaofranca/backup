@@ -15,14 +15,18 @@ import { Switch, useHistory, useLocation } from "react-router-dom";
 import logoImage from "../../../assets/logo.svg";
 import { useAuth } from "../../../providers/Auth";
 import Router from "../../../routes/route";
-import { Clients } from "../Clients";
-import { Details } from "../Clients/Details";
 import Home from "../Home";
+
+import Clients from "../Clients";
+import ClientDetails from "../Clients/Details";
+import Products from "../Products";
+import DetailsProduct from "../Products/Details";
+
 import { Leads } from "../Leads";
 import { Partners } from "../Partners";
-import { Products } from "../Products";
-import { DetailsProduct } from "../Products/Details";
 import { Users } from "../Users";
+
+
 import { Container } from "./styles";
 
 const { Header, Content, Sider } = Layout;
@@ -162,9 +166,17 @@ const _Layout = () => {
               <Router isPrivate path="/leads" component={Leads} />
               <Router isPrivate path="/users" component={Users} />
 
-              <Router isPrivate exact path="/clients" component={Clients} />
-
-              <Router isPrivate component={Details} path="/clients/:clientId" />
+              <Router
+                isPrivate
+                exact
+                path="/clients"
+                component={Clients}
+              />
+              <Router
+                isPrivate
+                component={ClientDetails}
+                path="/clients/:clientId"
+              />
 
               <Router exact isPrivate path="/products" component={Products} />
               <Router isPrivate path="/products/:productId" component={DetailsProduct} />

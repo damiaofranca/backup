@@ -29,4 +29,8 @@ export default createGlobalStyle`
   *::-webkit-scrollbar-track {
     background: transparent;
   }
+
+  .w-f {
+    width: 100% !important;
+  }
 `;

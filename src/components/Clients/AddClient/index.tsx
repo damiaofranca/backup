@@ -2,13 +2,13 @@ import { Select, Form, Input, Modal, notification } from "antd";
 import React, { useState } from "react";
 import api from "../../../api";
 
-interface AddProductProps {
+interface AddClientProps {
   onCancel: () => void;
   onSubmit: () => void;
   isVisible: boolean;
 }
 
-export const AddProduct: React.FC<AddProductProps> = ({ onSubmit, onCancel, isVisible }) => {
+const AddClient: React.FC<AddClientProps> = ({ onSubmit, onCancel, isVisible }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [partnerList] = useState([
@@ -25,7 +25,7 @@ export const AddProduct: React.FC<AddProductProps> = ({ onSubmit, onCancel, isVi
   const onFinish = async (values: any) => {
     setLoading(true);
     try {
-      await api.post(`/crm/product`, {
+      await api.post(`/crm/client`, {
         name: values.name,
         partner: values.partner,
         description: values.description,
@@ -58,7 +58,7 @@ export const AddProduct: React.FC<AddProductProps> = ({ onSubmit, onCancel, isVi
       title="Adicionar Produto"
       closable={false}
       maskClosable={false}
-      data-testid="modal-product-el"
+      data-testid="modal-client-el"
       okText="Adicionar"
       okButtonProps={{
         htmlType: "submit",
@@ -97,3 +97,5 @@ export const AddProduct: React.FC<AddProductProps> = ({ onSubmit, onCancel, isVi
     </Modal>
   );
 };
+
+export default AddClient;
