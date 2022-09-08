@@ -12,6 +12,7 @@ describe("test component of add user", () => {
 				name: "juantest",
 				email: "testemail213@gmail.com",
 				id: "sa21a-1ds23-cdsa1-1acc23",
+				admin: false,
 			}}
 		/>
 	);

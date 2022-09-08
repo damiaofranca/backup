@@ -6,7 +6,8 @@ import { AddUser } from "../../../components/Users/AddUsers";
 import { EditUser } from "../../../components/Users/EditUser";
 import { Container, ContainerActions } from "./styles";
 
-export const Users: React.FC = (props) => {
+export const Users: React.FC = (props) =>
+{
   const defaultPageSize = 10;
   const [data, setData] = useState([]);
   const [tableLoading, setTableLoading] = useState(false);
@@ -20,7 +21,9 @@ export const Users: React.FC = (props) => {
     name: string | null;
     email: string | null;
     id: string | null;
+    admin: boolean;
   }>({
+    admin: false,
     email: null,
     name: null,
     id: null,
@@ -28,60 +31,72 @@ export const Users: React.FC = (props) => {
   const [shouldReloadTable, setShouldReloadTable] = useState(false);
   const onHandleReloadData = () => setShouldReloadTable(!shouldReloadTable);
 
-  const clearUserInfo = () => {
+  const clearUserInfo = () =>
+  {
     setUserInfo({
       id: null,
       name: null,
       email: null,
+      admin: false,
     });
   };
 
-  const sendEmailToReset = async (email: string) => {
-    try {
-      await api.patch("/api/crm/accounts/reset-password", {
-        email,
-      });
+  const sendEmailToReset = async (idUser: string) =>
+  {
+    try
+    {
+      await api.post(`public/user/${ idUser }/change-password`);
       notification.success({ message: "Email enviado com sucesso!" });
-    } catch (error) {
+    } catch (error)
+    {
       notification.error({ message: "Erro ao enviar dados!" });
       throw new Error("Erro ao enviar dados! " + error);
     }
   };
-
-  const deleteUser = async (id: string) => {
-    try {
-      await api.delete(`api/crm/accounts/user/${id}`);
+  //
+  const deleteUser = async (id: string) =>
+  {
+    try
+    {
+      await api.delete(`crm/user/${ id }`);
       await loadData({
         current: 1,
         pageSize: defaultPageSize,
       })
-        .then((response) => {
+        .then((response) =>
+        {
           setData(response.data);
           setTablePagination((old) => ({ ...old, total: response.total }));
         })
-        .catch(() => notification.error({ message: "Erro ao carregar dados!" }));
-
+        .catch(() =>
+          notification.error({ message: "Erro ao carregar dados!" })
+        );
       notification.success({ message: "Usuário deletado com sucesso!" });
-    } catch (error) {
+    } catch (error)
+    {
       notification.error({ message: "Erro ao deletar usuário!" });
       throw new Error("Erro ao deletar usuário! " + error);
     }
   };
 
-  const loadData = useCallback(async (params: any) => {
+  const loadData = useCallback(async (params: any) =>
+  {
     setTableLoading(true);
     const { current, pageSize, sortField, sortOrder, filters } = params;
-    try {
-      const { data } = await api.get("/api/crm/accounts/users", {
+    try
+    {
+      const { data } = await api.get("crm/user", {
         params: {
           per_page: pageSize,
           page: current,
         },
       });
       return data;
-    } catch (error) {
+    } catch (error)
+    {
       throw new Error("Erro ao carregar dados! " + error);
-    } finally {
+    } finally
+    {
       setTableLoading(false);
     }
   }, []);
@@ -105,32 +120,39 @@ export const Users: React.FC = (props) => {
       title: "Ações",
       width: "100px",
       align: "center",
-      render: (_, record) => {
+      render: (_, record) =>
+      {
         return (
           <ContainerActions>
             <Button
               key="bt-edit"
               size="small"
-              onClick={() => {
+              onClick={ () =>
+              {
                 setUserInfo({
                   id: record.id,
                   name: record.name,
                   email: record.email,
+                  admin: record.admin,
                 });
-              }}
+              } }
             >
               Editar
             </Button>
-            <Popconfirm title="Têm certeza que deseja trocar a senha ?" onConfirm={() => sendEmailToReset(record.email)}>
+            <Popconfirm
+              title="Têm certeza que deseja trocar a senha ?"
+              onConfirm={ () => sendEmailToReset(record.id) }
+            >
               <Button key="bt-change-password" size="small">
                 Alterar senha
               </Button>
             </Popconfirm>
             <Popconfirm
               title="Têm certeza que deseja deletar o usuário ?"
-              onConfirm={() => {
+              onConfirm={ () =>
+              {
                 deleteUser(record.id);
-              }}
+              } }
             >
               <Button key="bt-delete" size="small">
                 deletar
@@ -142,13 +164,16 @@ export const Users: React.FC = (props) => {
     },
   ];
 
-  const onHandleTableChange = (pagination: any, filters: any, sorter: any) => {
+  const onHandleTableChange = (pagination: any, filters: any, sorter: any) =>
+  {
     if (!pagination) return;
     let newFilters: any = {};
-    for (const key in filters) {
+    for (const key in filters)
+    {
       if (filters[key] === null) continue;
       const value = filters[key];
-      if (value.length > 1) {
+      if (value.length > 1)
+      {
         newFilters[key] = value;
         continue;
       }
@@ -161,7 +186,8 @@ export const Users: React.FC = (props) => {
       ...pagination,
       filters: newFilters,
     })
-      .then((response) => {
+      .then((response) =>
+      {
         setTablePagination((old) => ({
           ...old,
           ...pagination,
@@ -172,19 +198,22 @@ export const Users: React.FC = (props) => {
       .catch(() => notification.error({ message: "Erro ao carregar dados!" }));
   };
 
-  useEffect(() => {
+  useEffect(() =>
+  {
     let didCancel = false;
     loadData({
       current: 1,
       pageSize: defaultPageSize,
     })
-      .then((response) => {
+      .then((response) =>
+      {
         !didCancel && setData(response.data);
         setTablePagination((old) => ({ ...old, total: response.total }));
       })
       .catch(() => notification.error({ message: "Erro ao carregar dados!" }));
 
-    return () => {
+    return () =>
+    {
       didCancel = true;
     };
   }, [loadData, shouldReloadTable]);
@@ -192,44 +221,46 @@ export const Users: React.FC = (props) => {
   return (
     <Container aria-label="container-el">
       <AddUser
-        isVisible={isVisible}
-        onSubmit={() => {
+        isVisible={ isVisible }
+        onSubmit={ () =>
+        {
           setIsVisible(false);
           onHandleReloadData();
-        }}
-        onCancel={() => setIsVisible(false)}
+        } }
+        onCancel={ () => setIsVisible(false) }
       />
 
       <EditUser
-        isVisible={userInfo.name !== null ? true : false}
-        onSubmit={() => {
+        isVisible={ userInfo.name !== null ? true : false }
+        onSubmit={ () =>
+        {
           onHandleReloadData();
-        }}
-        user={userInfo}
-        onCancel={clearUserInfo}
+        } }
+        user={ userInfo }
+        onCancel={ clearUserInfo }
       />
       <PageHeader
         title="Usuários"
         subTitle=""
-        extra={[
-          <Button onClick={onHandleReloadData} data-testid="load-data-el" icon={<ReloadOutlined />} key="bt-ds-reload">
+        extra={ [
+          <Button onClick={ onHandleReloadData } data-testid="load-data-el" icon={ <ReloadOutlined /> } key="bt-ds-reload">
             Recarregar dados
           </Button>,
-          <Button onClick={() => setIsVisible(true)} data-testid="new-data-el" icon={<PlusOutlined />} key="bt-ds-new" type="primary">
+          <Button onClick={ () => setIsVisible(true) } data-testid="new-data-el" icon={ <PlusOutlined /> } key="bt-ds-new" type="primary">
             Novo
           </Button>,
-        ]}
+        ] }
       >
-        <Row style={{ marginTop: 12 }}>
-          <Col md={24}>
+        <Row style={ { marginTop: 12 } }>
+          <Col md={ 24 }>
             <Table
-              rowKey={(record: any) => record.id}
-              onChange={onHandleTableChange}
-              pagination={tablePagination}
-              loading={tableLoading}
+              rowKey={ (record: any) => record.id }
+              onChange={ onHandleTableChange }
+              pagination={ tablePagination }
+              loading={ tableLoading }
               data-testid="table-users-el"
-              columns={tableCols}
-              dataSource={data}
+              columns={ tableCols }
+              dataSource={ data }
               size="middle"
             />
           </Col>
