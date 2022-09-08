@@ -29,7 +29,9 @@ export const Users: React.FC = (props) => {
 		name: string | null;
 		email: string | null;
 		id: string | null;
+		admin: boolean;
 	}>({
+		admin: false,
 		email: null,
 		name: null,
 		id: null,
@@ -42,24 +44,23 @@ export const Users: React.FC = (props) => {
 			id: null,
 			name: null,
 			email: null,
+			admin: false,
 		});
 	};
 
-	const sendEmailToReset = async (email: string) => {
+	const sendEmailToReset = async (idUser: string) => {
 		try {
-			await api.patch("/api/crm/accounts/reset-password", {
-				email,
-			});
+			await api.post(`public/user/${idUser}/change-password`);
 			notification.success({ message: "Email enviado com sucesso!" });
 		} catch (error) {
 			notification.error({ message: "Erro ao enviar dados!" });
 			throw new Error("Erro ao enviar dados! " + error);
 		}
 	};
-
+	//
 	const deleteUser = async (id: string) => {
 		try {
-			await api.delete(`api/crm/accounts/user/${id}`);
+			await api.delete(`crm/user/${id}`);
 			await loadData({
 				current: 1,
 				pageSize: defaultPageSize,
@@ -71,7 +72,6 @@ export const Users: React.FC = (props) => {
 				.catch(() =>
 					notification.error({ message: "Erro ao carregar dados!" })
 				);
-
 			notification.success({ message: "Usuário deletado com sucesso!" });
 		} catch (error) {
 			notification.error({ message: "Erro ao deletar usuário!" });
@@ -83,7 +83,7 @@ export const Users: React.FC = (props) => {
 		setTableLoading(true);
 		const { current, pageSize, sortField, sortOrder, filters } = params;
 		try {
-			const { data } = await api.get("/api/crm/accounts/users", {
+			const { data } = await api.get("crm/user", {
 				params: {
 					per_page: pageSize,
 					page: current,
@@ -127,6 +127,7 @@ export const Users: React.FC = (props) => {
 									id: record.id,
 									name: record.name,
 									email: record.email,
+									admin: record.admin,
 								});
 							}}
 						>
@@ -134,7 +135,7 @@ export const Users: React.FC = (props) => {
 						</Button>
 						<Popconfirm
 							title="Têm certeza que deseja trocar a senha ?"
-							onConfirm={() => sendEmailToReset(record.email)}
+							onConfirm={() => sendEmailToReset(record.id)}
 						>
 							<Button key="bt-change-password" size="small">
 								Alterar senha

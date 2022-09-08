@@ -1,4 +1,4 @@
-import { Form, Input, Modal, notification } from "antd";
+import { Checkbox, Form, Input, Modal, notification } from "antd";
 import { useState } from "react";
 import api from "../../../api";
 
@@ -18,7 +18,7 @@ export const AddUser: React.FC<AddUserProps> = ({
 	const onFinish = async (values: any) => {
 		setLoading(true);
 		try {
-			await api.post(`/api/accounts`, { ...values, consent_email: false });
+			await api.post(`crm/user`, { ...values });
 
 			notification.success({
 				message: "Usuário adicionado com sucesso",
@@ -63,7 +63,7 @@ export const AddUser: React.FC<AddUserProps> = ({
 					.then(() => {
 						form.submit();
 					})
-					.catch((info) => {
+					.catch((info: any) => {
 						console.log("Validate Failed: ", info);
 					});
 			}}
@@ -82,7 +82,7 @@ export const AddUser: React.FC<AddUserProps> = ({
 				<Form.Item
 					name="name"
 					label="Nome"
-					rules={[{ required: true, max: 512, min: 2 }]}
+					rules={[{ required: true, max: 512, min: 5 }]}
 				>
 					<Input
 						placeholder="Digite o nome do usuário"
@@ -92,22 +92,15 @@ export const AddUser: React.FC<AddUserProps> = ({
 				<Form.Item
 					name="email"
 					label="Email"
-					rules={[{ required: true, max: 512, min: 2, type: "email" }]}
+					rules={[{ required: true, max: 512, min: 10, type: "email" }]}
 				>
 					<Input
 						placeholder="Digite o email do usuário"
 						aria-label="email-input-form"
 					/>
 				</Form.Item>
-				<Form.Item
-					name="password"
-					label="Senha"
-					rules={[{ required: true, max: 512, min: 6 }]}
-				>
-					<Input
-						placeholder="Digite a senha do usuário"
-						aria-label="password-input-form"
-					/>
+				<Form.Item name="admin" valuePropName="checked">
+					<Checkbox aria-label="admin-active-check-el">Administrador</Checkbox>
 				</Form.Item>
 			</Form>
 		</Modal>

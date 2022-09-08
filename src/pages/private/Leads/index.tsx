@@ -37,9 +37,8 @@ export const Leads: React.FC = (props) => {
 			filters,
 		} = params;
 		try {
-			const { data } = await api.get("/api/crm/leads", {
+			const { data } = await api.get("crm/lead", {
 				params: {
-					filtered: "only_leads",
 					start_date: start_date,
 					end_date: end_date,
 					per_page: pageSize,

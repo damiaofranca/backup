@@ -1,4 +1,4 @@
-import { Form, Input, Modal, notification } from "antd";
+import { Checkbox, Form, Input, Modal, notification } from "antd";
 import { useEffect, useState } from "react";
 import api from "../../../api";
 
@@ -6,7 +6,12 @@ interface AddUserProps {
 	onCancel: () => void;
 	onSubmit: () => void;
 	isVisible: boolean;
-	user: { name: string | null; email: string | null; id: string | null };
+	user: {
+		name: string | null;
+		email: string | null;
+		id: string | null;
+		admin: boolean;
+	};
 }
 
 export const EditUser: React.FC<AddUserProps> = ({
@@ -20,15 +25,14 @@ export const EditUser: React.FC<AddUserProps> = ({
 	const onFinish = async (values: any) => {
 		setLoading(true);
 		try {
-			await api.post(`/api/accounts/user`, {
+			await api.patch(`crm/user/${user.id}`, {
 				...values,
-				consent_email: false,
 			});
 
 			notification.success({
 				message: "Usuário editado com sucesso",
 			});
-
+			onCancel();
 			onReset();
 			onSubmit && onSubmit();
 
@@ -50,6 +54,7 @@ export const EditUser: React.FC<AddUserProps> = ({
 		if (user) {
 			form.setFieldsValue({
 				email: user.email,
+				admin: user.admin,
 				name: user.name,
 				id: user.name,
 			});
@@ -77,7 +82,7 @@ export const EditUser: React.FC<AddUserProps> = ({
 					.then(() => {
 						form.submit();
 					})
-					.catch((info) => {
+					.catch((info: any) => {
 						console.log("Validate Failed: ", info);
 					});
 			}}
@@ -112,6 +117,9 @@ export const EditUser: React.FC<AddUserProps> = ({
 						placeholder="Digite o email do usuário"
 						aria-label="email-input-form"
 					/>
+				</Form.Item>
+				<Form.Item name="admin" valuePropName="checked">
+					<Checkbox aria-label="admin-active-check-el">Administrador</Checkbox>
 				</Form.Item>
 			</Form>
 		</Modal>
