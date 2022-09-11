@@ -8,7 +8,9 @@ import {
 	Table,
 	TableColumnType,
 } from "antd";
+import { format } from "date-fns";
 import React, { useCallback, useEffect, useState } from "react";
+import { ptBR } from "date-fns/locale";
 import api from "../../../api";
 import { FilterByDate } from "../../../utils/filterByDate";
 import { Container } from "./styles";
@@ -37,12 +39,16 @@ export const Leads: React.FC = (props) => {
 			filters,
 		} = params;
 		try {
-			const { data } = await api.get("crm/lead", {
+			const { data } = await api.get("/crm/lead", {
 				params: {
-					start_date: start_date,
-					end_date: end_date,
-					per_page: pageSize,
 					page: current,
+					per_page: pageSize,
+					end_date: end_date,
+					start_date: start_date,
+					...(filters ? { filters } : {}),
+					offset: (current - 1) * pageSize,
+					...(sortField ? { order_by: sortField } : {}),
+					...(sortOrder ? { sort_by: sortOrder } : {}),
 				},
 			});
 			return data;
@@ -55,37 +61,58 @@ export const Leads: React.FC = (props) => {
 
 	const tableCols: TableColumnType<any>[] = [
 		{
+			sorter: true,
 			key: "value",
 			title: "Nome",
 			dataIndex: "name",
-			sorter: {
-				compare: (a, b) => a.name.localeCompare(b.name),
-			},
 		},
 		{
+			sorter: true,
 			key: "email",
 			title: "Email",
 			dataIndex: "email",
 		},
 		{
+			width: 300,
+			sorter: true,
+			title: "Campanha",
 			key: "utm_campaign",
-			title: "UTM Campanha",
 			dataIndex: "utm_campaign",
 		},
 		{
+			width: 300,
+			sorter: true,
+			title: "Meio",
 			key: "utm_medium",
-			title: "UTM Médio",
 			dataIndex: "utm_medium",
 		},
 		{
+			width: 300,
+			sorter: true,
+			title: "Origem",
 			key: "utm_source",
-			title: "UTM Fonte",
 			dataIndex: "utm_source",
 		},
 		{
+			sorter: true,
+			width: 300,
+			title: "Termo",
 			key: "utm_term",
-			title: "UTM Termo",
 			dataIndex: "utm_term",
+		},
+		{
+			key: "created_at",
+			title: "Dt de Criação",
+			width: 180,
+			render: (_: any, record) => {
+				return (
+					<>
+						{format(new Date(record.created_at), "Pp", {
+							locale: ptBR,
+						})}
+					</>
+				);
+			},
 		},
 	];
 

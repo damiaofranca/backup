@@ -4,101 +4,197 @@ import {
 	Divider,
 	Form,
 	Input,
+	notification,
 	PageHeader,
 	Row,
 	Space,
 	Table,
 	TableColumnType,
 	Tabs,
-	Tag,
 } from "antd";
 import { format } from "date-fns";
-import React, { useEffect, useState } from "react";
-import { useHistory } from "react-router-dom";
-import { documentCPF, phoneNumber } from "../../../../utils/validators";
-import mockDetail from "./mock";
+import { ReloadOutlined } from "@ant-design/icons";
+import React, { useCallback, useEffect, useState } from "react";
+import { useHistory, useParams } from "react-router-dom";
+import api from "../../../../api";
+import {
+	formatCPF,
+	formatPhoneNumber,
+	formatPrice,
+} from "../../../../utils/functions";
 import { Container } from "./styles";
+import ListPayments from "../../../../components/Products/Offers/ListPayments";
 const { TabPane } = Tabs;
 interface DetailsProps {}
 
 const ClientDetails: React.FC<DetailsProps> = () => {
+	const defaultPageSize = 10;
 	const history = useHistory();
 	const [form] = Form.useForm();
 	const [data, setData] = useState([]);
 	const [isEditing, setIsEditing] = useState(false);
+	const { clientId } = useParams<{ clientId: string }>();
 	const [tableLoading, setTableLoading] = useState(false);
-	const [shouldReloadTable, setShouldReloadTable] = useState(false);
 	const [tablePagination, setTablePagination] = useState({
 		current: 1,
 		pageSize: 10,
 		showSizeChanger: true,
 	});
+	const [shouldReloadTable, setShouldReloadTable] = useState(false);
+	const onHandleReloadData = () => setShouldReloadTable(!shouldReloadTable);
+	const loadData = useCallback(async () => {
+		setTableLoading(true);
+		try {
+			const { data } = await api.get(`/crm/customer/${clientId}`, {});
+			form.setFieldsValue({
+				name: data.name,
+				email: data.email,
+				document: formatCPF(data.document),
+				phone: formatPhoneNumber(data.phone),
+			});
+		} catch (error) {
+			throw new Error("Erro ao carregar dados! " + error);
+		} finally {
+			setTableLoading(false);
+		}
+	}, []);
+
+	const loadDataSubscription = useCallback(async (params: any) => {
+		setTableLoading(true);
+		const {
+			start_date,
+			sortOrder,
+			sortField,
+			end_date,
+			pageSize,
+			current,
+			filters,
+		} = params;
+		try {
+			const { data } = await api.get(`/crm/customer/${clientId}/subscription`, {
+				params: {
+					page: current,
+					per_page: pageSize,
+					end_date: end_date,
+					start_date: start_date,
+					...(filters ? { filters } : {}),
+					offset: (current - 1) * pageSize,
+					...(sortField ? { order_by: sortField } : {}),
+					...(sortOrder ? { sort_by: sortOrder } : {}),
+				},
+			});
+			return data;
+		} catch (error) {
+			throw new Error("Erro ao carregar dados! " + error);
+		} finally {
+			setTableLoading(false);
+		}
+	}, []);
+
+	const onHandleTableChange = (pagination: any, filters: any, sorter: any) => {
+		if (!pagination) return;
+		let newFilters: any = {};
+		for (const key in filters) {
+			if (filters[key] === null) continue;
+			const value = filters[key];
+			if (value.length > 1) {
+				newFilters[key] = value;
+				continue;
+			}
+			newFilters[key] = value[0];
+		}
+
+		loadDataSubscription({
+			sortField: sorter.field === "id" ? "name" : sorter.field,
+			sortOrder: sorter.order,
+			...pagination,
+			filters: newFilters,
+		})
+			.then((response) => {
+				setTablePagination((old) => ({
+					...old,
+					...pagination,
+					total: response.total,
+				}));
+				setData(response.data);
+			})
+			.catch(() => notification.error({ message: "Erro ao carregar dados!" }));
+	};
 
 	const tableCols: TableColumnType<any>[] = [
 		{
 			key: "id",
+			width: 240,
+			sorter: true,
 			title: "Nome",
-			sorter: {
-				compare: (a, b) => a.plan.name.localeCompare(b.plan.name),
-			},
+			dataIndex: "id",
 			render: (_, record) => {
-				return <>{record.plan.name}</>;
+				return <>{record.offer.name}</>;
 			},
-			width: 280,
 		},
 		{
+			width: 180,
 			key: "price",
 			title: "Preço",
-			dataIndex: "price",
 			render: (_, record) => {
-				return <>{"R$ " + record.plan.price}</>;
+				return <>{formatPrice(record.offer.price)}</>;
 			},
 		},
 		{
+			width: 180,
 			key: "start_date",
-			title: "Data de assinatura",
-			dataIndex: "start_date",
+			title: "Data de Assínatura",
 			render: (_, record) => {
 				return <>{format(new Date(record.start_date), "dd/MM/yyyy")}</>;
 			},
 		},
 		{
-			key: "validate_date",
-			title: "Data de expiração",
-			dataIndex: "validate_date",
-			render: (_, record) => {
-				return <>{format(new Date(record.validate_date), "dd/MM/yyyy")}</>;
-			},
-		},
-		{
+			width: 180,
 			key: "end_date",
-			title: "Data do próximo pagamento",
-			dataIndex: "end_date",
+			title: "Data de Expiração",
 			render: (_, record) => {
 				return <>{format(new Date(record.end_date), "dd/MM/yyyy")}</>;
 			},
 		},
 		{
-			key: "is_active",
-			title: "Status da assinatura",
-			dataIndex: "is_active",
+			width: 180,
+			title: "Período de Testes",
+			key: "grace_period_end_date",
 			render: (_, record) => {
-				return (
-					<Tag color={record.is_active === true ? "green" : "volcano"}>
-						{record.is_active === true ? "Ativado" : "Desativado"}
-					</Tag>
-				);
+				return <>{record.grace_period_end_date + " Dias"}</>;
 			},
 		},
 	];
+
+	const setDataSubscriptions = (
+		start_date?: string | null,
+		end_date?: string | null
+	) => {
+		let didCancel = false;
+		loadDataSubscription({
+			pageSize: defaultPageSize,
+			start_date: start_date,
+			end_date: end_date,
+			current: 1,
+		})
+			.then((response) => {
+				!didCancel && setData(response.data);
+				setTablePagination((old) => ({ ...old, total: response.total }));
+			})
+			.catch(() => notification.error({ message: "Erro ao carregar dados!" }));
+
+		return () => {
+			didCancel = true;
+		};
+	};
+
 	useEffect(() => {
-		form.setFieldsValue({
-			name: mockDetail.name,
-			email: mockDetail.email,
-			document: mockDetail.document,
-			phone_number: mockDetail.phone_number,
-		});
-	}, [form]);
+		loadData();
+	}, [clientId]);
+
+	useEffect(() => {
+		setDataSubscriptions();
+	}, [loadDataSubscription, shouldReloadTable]);
 
 	return (
 		<Container aria-label="container-el">
@@ -111,66 +207,48 @@ const ClientDetails: React.FC<DetailsProps> = () => {
 							autoComplete="off"
 							data-testid="form-el"
 						>
-							<Row gutter={16}>
-								<Col md={8}>
-									<Form.Item
-										name="name"
-										label="Nome"
-										rules={[{ required: true, max: 512, min: 2 }]}
-									>
-										<Input
-											placeholder="Digite o nome do cliente"
-											aria-label="name-input-el"
-											disabled={!isEditing}
-										/>
-									</Form.Item>
-								</Col>
-								<Col md={8}>
-									<Form.Item
-										name="email"
-										label="Email"
-										rules={[{ required: true, type: "email" }]}
-									>
-										<Input
-											placeholder="Digite o email do cliente"
-											aria-label="email-input-el"
-											disabled={!isEditing}
-										/>
-									</Form.Item>
-								</Col>
-								<Col md={8}>
-									<Form.Item
-										name="document"
-										label="Documento"
-										rules={[{ required: true }, { validator: documentCPF }]}
-									>
-										<Input
-											placeholder="Digite o documento do cliente"
-											aria-label="document-input-el"
-											disabled={!isEditing}
-										/>
-									</Form.Item>
-								</Col>
-								<Col md={8}>
-									<Form.Item
-										name="phone_number"
-										label="Telefone"
-										rules={[
-											{
-												required: true,
-												max: 512,
-												min: 2,
-												validator: phoneNumber,
-											},
-										]}
-									>
-										<Input
-											placeholder="Digite o telefone do cliente"
-											disabled={!isEditing}
-										/>
-									</Form.Item>
-								</Col>
-							</Row>
+							<Col md={16}>
+								<Row gutter={20}>
+									<Col md={8}>
+										<Form.Item name="name" label="Nome">
+											<Input
+												placeholder="Digite o nome do cliente"
+												aria-label="name-input-el"
+												disabled={!isEditing}
+											/>
+										</Form.Item>
+									</Col>
+									<Col md={8}>
+										<Form.Item name="document" label="Documento">
+											<Input
+												placeholder="Digite o email do cliente"
+												aria-label="email-input-el"
+												disabled={!isEditing}
+											/>
+										</Form.Item>
+									</Col>
+								</Row>
+
+								<Row gutter={20}>
+									<Col md={8}>
+										<Form.Item name="email" label="Email">
+											<Input
+												placeholder="Digite o email do cliente"
+												aria-label="email-input-el"
+												disabled={!isEditing}
+											/>
+										</Form.Item>
+									</Col>
+									<Col md={8}>
+										<Form.Item name="phone" label="Telefone">
+											<Input
+												placeholder="Digite o telefone do cliente"
+												disabled={!isEditing}
+											/>
+										</Form.Item>
+									</Col>
+								</Row>
+							</Col>
 							<Row justify="end">
 								<Col aria-label="container-actions-el">
 									{isEditing ? (
@@ -197,15 +275,36 @@ const ClientDetails: React.FC<DetailsProps> = () => {
 				<Divider />
 				<Tabs defaultActiveKey="1">
 					<TabPane tab="Assinaturas" key="1">
-						<Table
-							size="middle"
-							rowKey={(record: any) => record.id}
-							dataSource={mockDetail.subscription}
-							pagination={tablePagination}
-							loading={tableLoading}
-							columns={tableCols}
-							aria-label="table-el"
-						/>
+						<PageHeader
+							subTitle=""
+							extra={[
+								<Button
+									key="bt-ds-reload"
+									icon={<ReloadOutlined />}
+									onClick={onHandleReloadData}
+								>
+									Recarregar dados
+								</Button>,
+							]}
+						>
+							<Row style={{ marginTop: 12 }}>
+								<Col md={24}>
+									<Table
+										size="middle"
+										rowKey={(record: any) => record.id}
+										onChange={onHandleTableChange}
+										pagination={tablePagination}
+										loading={tableLoading}
+										aria-label="table-el"
+										columns={tableCols}
+										dataSource={data}
+									/>
+								</Col>
+							</Row>
+						</PageHeader>
+					</TabPane>
+					<TabPane tab="Pagamentos" key="2">
+						<ListPayments customerId={clientId} />
 					</TabPane>
 				</Tabs>
 			</PageHeader>

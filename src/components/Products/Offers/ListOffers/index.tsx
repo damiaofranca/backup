@@ -1,24 +1,30 @@
-import { AddProduct } from "../../../components/Products/AddProducts";
 import { PlusOutlined, ReloadOutlined } from "@ant-design/icons";
-import { DescriptionShorter } from "../../../utils/description";
-import { Container } from "./styles";
+import {
+	Button,
+	Col,
+	notification,
+	PageHeader,
+	Popconfirm,
+	Row,
+	Table,
+	TableColumnType,
+} from "antd";
 import { format } from "date-fns";
 import { useCallback, useEffect, useState } from "react";
-import {
-	TableColumnType,
-	PageHeader,
-	Button,
-	Table,
-	Col,
-	Row,
-	notification,
-} from "antd";
-import api from "../../../api";
 import { Link } from "react-router-dom";
+import api from "../../../../api";
+import AddOffer from "../AddOffer";
+import { DescriptionShorter } from "../../../../utils/description";
+import { Container, ContainerActions } from "./styles";
+import { formatPrice } from "../../../../utils/functions";
+import EditOffer from "../EditOffer";
+import { Offer } from "../../../../pages/private/Products/model";
 
-interface ProductsProps {}
+export interface ListOfferProps {
+	productId: string;
+}
 
-const Products: React.FC<ProductsProps> = () => {
+const ListOffers: React.FC<ListOfferProps> = ({ productId }) => {
 	const defaultPageSize = 10;
 	const [data, setData] = useState([]);
 	const [tableLoading, setTableLoading] = useState(false);
@@ -29,12 +35,15 @@ const Products: React.FC<ProductsProps> = () => {
 		pageSize: 10,
 		showSizeChanger: true,
 	});
+	const [productSelected, setProductSelected] = useState<Offer | null>(null);
+
+	const onHandleReloadData = () => setShouldReloadTable(!shouldReloadTable);
 
 	const loadData = useCallback(async (params: any) => {
 		setTableLoading(true);
 		const { sortOrder, sortField, pageSize, current, filters } = params;
 		try {
-			const { data } = await api.get("/crm/product", {
+			const { data } = await api.get(`/crm/offer/${productId}`, {
 				params: {
 					page: current,
 					pageSize: pageSize,
@@ -82,26 +91,55 @@ const Products: React.FC<ProductsProps> = () => {
 			.catch(() => notification.error({ message: "Erro ao carregar dados!" }));
 	};
 
-	const onHandleReloadData = () => setShouldReloadTable(!shouldReloadTable);
+	const handleDelete = useCallback(async (offerID: string) => {
+		try {
+			await api.delete(`/crm/offer/${offerID}`);
+			onHandleReloadData();
+			notification.success({
+				message: "Oferta deletada com sucesso",
+			});
+		} catch (error) {
+			notification.error({
+				message:
+					"Ocorreu algum erro ao deletar a oferta. Tente novamente., " + error,
+			});
+		}
+	}, []);
 
 	const tableCols: TableColumnType<any>[] = [
 		{
 			key: "id",
-			sorter: true,
+			width: 300,
 			title: "Nome",
-			render: (_: any, record) => {
-				return <>{record.name}</>;
-			},
+			dataIndex: "name",
 		},
 		{
 			sorter: true,
 			key: "description",
+			title: "Descrição",
 			dataIndex: "description",
-			title: "Descrição do produto",
 			render: (_: any, record) => {
 				return (
 					<DescriptionShorter description={record.description} limit={36} />
 				);
+			},
+		},
+
+		{
+			width: 180,
+			key: "grace_period",
+			title: "Período de Testes",
+			dataIndex: "grace_period",
+			render: (_: any, record) => {
+				return <>{record.grace_period + " Dias"}</>;
+			},
+		},
+		{
+			width: 180,
+			key: "price",
+			title: "Preço",
+			render: (_, record) => {
+				return <>{formatPrice(record.price)}</>;
 			},
 		},
 		{
@@ -120,11 +158,33 @@ const Products: React.FC<ProductsProps> = () => {
 			align: "center",
 			render: (_, record) => {
 				return (
-					<Link to={`/products/${record.id}`}>
-						<Button key="bt-view" size="small">
-							Detalhes
+					<ContainerActions>
+						<Button
+							key="bt-edit"
+							size="small"
+							onClick={() => {
+								setProductSelected(record);
+							}}
+						>
+							Editar
 						</Button>
-					</Link>
+						<Popconfirm
+							title="Têm certeza que deseja deletar está oferta ?"
+							onConfirm={() => {
+								handleDelete(record.id);
+							}}
+						>
+							<Button
+								key="bt-delete"
+								type="primary"
+								color="danger"
+								size="small"
+								danger
+							>
+								deletar
+							</Button>
+						</Popconfirm>
+					</ContainerActions>
 				);
 			},
 		},
@@ -144,10 +204,8 @@ const Products: React.FC<ProductsProps> = () => {
 	}, [loadData, shouldReloadTable]);
 
 	return (
-		<Container data-testid="container-el">
+		<Container data-testid="container-offers-el">
 			<PageHeader
-				title="Produtos"
-				subTitle=""
 				extra={[
 					<Button
 						key="bt-ds-reload"
@@ -170,7 +228,7 @@ const Products: React.FC<ProductsProps> = () => {
 					<Col md={24}>
 						<Table
 							rowKey={(record: any) => record.id}
-							data-testid="table-product-el"
+							data-testid="table-product-offers-el"
 							pagination={tablePagination}
 							loading={tableLoading}
 							columns={tableCols}
@@ -181,13 +239,24 @@ const Products: React.FC<ProductsProps> = () => {
 					</Col>
 				</Row>
 			</PageHeader>
-			<AddProduct
+			<AddOffer
 				onCancel={() => setIsVisibleModal(false)}
-				isVisible={isVisibleModal}
 				onSubmit={onHandleReloadData}
+				isVisible={isVisibleModal}
+				productId={productId}
+			/>
+			<EditOffer
+				isVisible={
+					productSelected && productSelected.name !== null ? true : false
+				}
+				onCancel={() => {
+					setProductSelected(null);
+				}}
+				onSubmit={onHandleReloadData}
+				offer={productSelected!}
 			/>
 		</Container>
 	);
 };
 
-export default Products;
+export default ListOffers;

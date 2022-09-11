@@ -25,7 +25,7 @@ export const EditUser: React.FC<AddUserProps> = ({
 	const onFinish = async (values: any) => {
 		setLoading(true);
 		try {
-			await api.patch(`crm/user/${user.id}`, {
+			await api.patch(`/crm/user/${user.id}`, {
 				...values,
 			});
 

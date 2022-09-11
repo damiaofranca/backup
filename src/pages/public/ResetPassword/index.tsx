@@ -31,7 +31,7 @@ export const ResetPassword: React.FC<ResetPasswordProps> = () => {
 	const onFinish = async (values: any) => {
 		if (values.password === values.passwordAgain) {
 			try {
-				await api.post(`public/user/reset-password`, {
+				await api.post(`/public/user/reset-password`, {
 					password: values.password,
 					token,
 				});

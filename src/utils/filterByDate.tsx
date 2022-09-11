@@ -45,7 +45,7 @@ export const FilterByDate: React.FC<FilterByDateProps> = ({
 			<Modal
 				visible={showModalFilter}
 				title="Filtrar Leads"
-				closable={false}
+				closable={true}
 				maskClosable={false}
 				okText="Filtrar"
 				data-testid="modal-el"
@@ -64,15 +64,13 @@ export const FilterByDate: React.FC<FilterByDateProps> = ({
 				}}
 				footer={[
 					<Button
-						key="reset"
-						onClick={() => {
-							setShowModalFilter(false);
-						}}
+						onClick={onResetFilter}
+						type="primary"
+						color="danger"
+						key="cancel"
+						danger
 					>
-						Cancelar
-					</Button>,
-					<Button key="cancel" onClick={onResetFilter}>
-						Resetar filtro
+						Limpar Filtro
 					</Button>,
 					<Button key="filter" type="primary" onClick={() => [form.submit()]}>
 						Filtrar
@@ -84,21 +82,20 @@ export const FilterByDate: React.FC<FilterByDateProps> = ({
 					form={form}
 					name="control-hooks"
 					onFinish={saveFilter}
-					style={{ display: "flex", justifyContent: "space-between" }}
 				>
 					<Form.Item
 						name="start_date"
 						label="Data inicial"
 						rules={[{ required: true }]}
 					>
-						<DatePicker placeholder="Data inicial" style={{ width: "94%" }} />
+						<DatePicker placeholder="Data inicial" style={{ width: "100%" }} />
 					</Form.Item>
 					<Form.Item
 						name="end_date"
 						label="Data final"
 						rules={[{ required: true }]}
 					>
-						<DatePicker placeholder="Data final" style={{ width: "94%" }} />
+						<DatePicker placeholder="Data final" style={{ width: "100%" }} />
 					</Form.Item>
 				</Form>
 			</Modal>

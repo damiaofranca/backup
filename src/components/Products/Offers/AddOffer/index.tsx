@@ -2,154 +2,138 @@ import { Form, Input, InputNumber, Modal, notification } from "antd";
 import { useState } from "react";
 import api from "../../../../api";
 
-interface AddPlanProps
-{
+interface AddOfferProps {
 	onCancel: () => void;
 	onSubmit: () => void;
 	isVisible: boolean;
 	productId: string;
 }
 
-const AddPlan: React.FC<AddPlanProps> = ({
+const AddOffer: React.FC<AddOfferProps> = ({
 	onCancel,
 	onSubmit,
 	isVisible,
 	productId,
-}) =>
-{
+}) => {
 	const [form] = Form.useForm();
 	const [loading, setLoading] = useState(false);
 
-	const onFinish = async (values: any) =>
-	{
+	const onFinish = async (values: any) => {
 		setLoading(true);
-		try
-		{
+		try {
 			await api.post(`/crm/offer`, {
 				external_service_id: 1,
 				...values,
-				grace_period: `${ values.grace_period }`
+				productId: productId,
+				grace_period: `${values.grace_period}`,
 			});
 
 			notification.success({
-				message: "Plano inserido com sucesso",
+				message: "Oferta inserida com sucesso",
 			});
 			onCancel();
 			onReset();
 			onSubmit && onSubmit();
 
 			setLoading(false);
-		} catch (error)
-		{
+		} catch (error) {
 			notification.error({
 				message:
-					"Ocorreu algum erro ao inserir o plano. Tente novamente., " + error,
+					"Ocorreu algum erro ao inserir o oferta. Tente novamente., " + error,
 			});
 			setLoading(false);
 		}
 	};
 
-	const onReset = () =>
-	{
+	const onReset = () => {
 		form.resetFields();
 	};
 
-	console.log(form.getFieldsValue());
-
-
 	return (
 		<Modal
-			visible={ isVisible }
-			title="Adicionar Plano"
-			closable={ false }
-			maskClosable={ false }
+			visible={isVisible}
+			title="Adicionar Oferta"
+			closable={false}
+			maskClosable={false}
 			okText="Adicionar"
-			data-testid="modal-plan-product-el"
-			okButtonProps={ {
+			data-testid="modal-offer-product-el"
+			okButtonProps={{
 				htmlType: "submit",
 				disabled: loading,
 				loading: loading,
-			} }
-			cancelButtonProps={ {
+			}}
+			cancelButtonProps={{
 				disabled: loading,
-			} }
-			onOk={ () =>
-			{
+			}}
+			onOk={() => {
 				form
 					.validateFields()
-					.then(() =>
-					{
+					.then(() => {
 						form.submit();
 					})
-					.catch((info) =>
-					{
+					.catch((info) => {
 						console.log("Validate Failed: ", info);
 					});
-			} }
-			onCancel={ () =>
-			{
+			}}
+			onCancel={() => {
 				onReset();
 				onCancel && onCancel();
-			} }
+			}}
 		>
 			<Form
 				layout="vertical"
-				form={ form }
+				form={form}
 				name="control-hooks"
 				aria-label="container-el"
-				onFinish={ onFinish }
+				onFinish={onFinish}
 			>
 				<Form.Item
 					name="name"
 					label="Nome"
-					rules={ [{ required: true, max: 512, min: 2 }] }
+					rules={[{ required: true, max: 512, min: 2 }]}
 				>
 					<Input
-						placeholder="Digite o nome do plano"
+						placeholder="Digite o nome do oferta"
 						aria-label="name-input-el"
 					/>
 				</Form.Item>
-				<Form.Item
-					name="price"
-					label="Preço"
-					rules={ [{ required: true }] }
-				>
+				<Form.Item name="price" label="Preço" rules={[{ required: true }]}>
 					<InputNumber
 						className="w-f"
-						placeholder="Digite o preço do plano"
+						placeholder="Digite o preço do oferta"
 						aria-label="price-input-el"
-						min={ 0 }
+						min={0}
 					/>
 				</Form.Item>
 				<Form.Item
 					name="grace_period"
 					label="Período de testes(dias)"
-					rules={ [] }
+					rules={[]}
 				>
 					<InputNumber
 						className="w-f"
 						placeholder="Digite o período de teste"
 						aria-label="grace-period-input-el"
-						formatter={ (value: any) => `${ value ? Math.floor(+value) : `0` }` }
-						parser={ value => value ? value : 0 as any }
-						min={ 0 }
-						max={ 365 }
+						formatter={(value: any) => `${value ? Math.floor(+value) : `0`}`}
+						parser={(value) => (value ? value : (0 as any))}
+						min={0}
+						max={365}
 					/>
 				</Form.Item>
 				<Form.Item
 					name="description"
 					label="Descrição"
-					rules={ [{ max: 512, min: 0 }] }
+					rules={[{ max: 512, min: 0 }]}
 				>
 					<Input.TextArea
-						placeholder="Digite a descrição do plano"
+						placeholder="Digite a descrição do oferta"
 						aria-label="description-input-el"
-						rows={ 4 }
+						rows={4}
 					/>
 				</Form.Item>
 			</Form>
-		</Modal >
+		</Modal>
 	);
 };
 
-export default AddPlan;
+export default AddOffer;

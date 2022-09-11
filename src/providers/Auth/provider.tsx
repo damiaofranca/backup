@@ -38,7 +38,7 @@ const Provider: React.FC<PropsWithChildren<ProviderProps>> = ({ children }) => {
 	const login = useCallback(
 		async (email: string, password: string) => {
 			try {
-				const { data } = await api.post("crm/auth/login", {
+				const { data } = await api.post("/crm/auth/login", {
 					email: email,
 					password: password,
 				});
