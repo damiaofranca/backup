@@ -121,12 +121,12 @@ const EditOffer: React.FC<AddPartnerProps> = ({
 				</Form.Item>
 				<Form.Item
 					name="grace_period"
-					label="Período de testes(dias)"
+					label="Data de carência(dias)"
 					rules={[{ max: 365, min: 0 }]}
 				>
 					<Input
 						type={"number"}
-						placeholder="Digite o período de teste"
+						placeholder="Digite o período de carência"
 						aria-label="grace-period-input-el"
 						min={0}
 					/>

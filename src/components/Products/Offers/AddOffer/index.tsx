@@ -107,12 +107,12 @@ const AddOffer: React.FC<AddOfferProps> = ({
 				</Form.Item>
 				<Form.Item
 					name="grace_period"
-					label="Período de testes(dias)"
+					label="Data de carência(dias)"
 					rules={[]}
 				>
 					<InputNumber
 						className="w-f"
-						placeholder="Digite o período de teste"
+						placeholder="Digite o período de carência"
 						aria-label="grace-period-input-el"
 						formatter={(value: any) => `${value ? Math.floor(+value) : `0`}`}
 						parser={(value) => (value ? value : (0 as any))}

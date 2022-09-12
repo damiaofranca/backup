@@ -13,6 +13,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import api from "../../../api";
 import { AddUser } from "../../../components/Users/AddUsers";
 import { EditUser } from "../../../components/Users/EditUser";
+import Filter from "../../../components/Users/filter";
 import { Container, ContainerActions } from "./styles";
 
 export const Users: React.FC = (props) => {
@@ -198,9 +199,10 @@ export const Users: React.FC = (props) => {
 			.catch(() => notification.error({ message: "Erro ao carregar dados!" }));
 	};
 
-	useEffect(() => {
+	const setDataWithFilters = (filters?: any) => {
 		let didCancel = false;
 		loadData({
+			filters,
 			current: 1,
 			pageSize: defaultPageSize,
 		})
@@ -213,6 +215,10 @@ export const Users: React.FC = (props) => {
 		return () => {
 			didCancel = true;
 		};
+	};
+
+	useEffect(() => {
+		setDataWithFilters();
 	}, [loadData, shouldReloadTable]);
 
 	return (
@@ -238,6 +244,15 @@ export const Users: React.FC = (props) => {
 				title="Usuários"
 				subTitle=""
 				extra={[
+					<Filter
+						key={"filter"}
+						onReset={() => {
+							setDataWithFilters(null);
+						}}
+						onFilter={(filters) => {
+							setDataWithFilters(filters);
+						}}
+					/>,
 					<Button
 						onClick={onHandleReloadData}
 						data-testid="load-data-el"

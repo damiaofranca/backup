@@ -11,6 +11,7 @@ import {
 } from "antd";
 import { useCallback, useEffect, useState } from "react";
 import api from "../../../../api";
+import Filter from "./filter";
 import { Container } from "./styles";
 
 export interface ListOfferProps {
@@ -43,7 +44,6 @@ const ListPayments: React.FC<ListOfferProps> = ({ customerId }) => {
 					...(sortOrder ? { sort_by: sortOrder } : {}),
 				},
 			});
-			console.log(data);
 			return data;
 		} catch (error) {
 			throw new Error("Erro ao carregar dados! " + error);
@@ -82,25 +82,61 @@ const ListPayments: React.FC<ListOfferProps> = ({ customerId }) => {
 			.catch(() => notification.error({ message: "Erro ao carregar dados!" }));
 	};
 
+	const paymentsStatus = (status: string) => {
+		switch (status) {
+			case "success":
+				return <Tag color="green">Succeso</Tag>;
+			case "canceled":
+				return <Tag color="red">Erro</Tag>;
+			case "not_captured":
+				return <Tag color="volcano">Não Capturado</Tag>;
+			case "payment_unauthorized":
+				return <Tag color="orange">Pagamento Não Autorizado</Tag>;
+			case "payment_fraud":
+				return <Tag color="orange">Fraude no pagamento</Tag>;
+			case "payment_error":
+				return <Tag color="orange">erro no pagamento</Tag>;
+		}
+	};
+
 	const tableCols: TableColumnType<any>[] = [
 		{
+			width: 400,
+			sorter: true,
+			title: "Oferta",
+			key: "offer_name",
+			dataIndex: "offer_name",
+		},
+		{
+			width: 300,
 			sorter: true,
 			key: "brand",
-			title: "Marca",
+			title: "Bandeira",
 			dataIndex: "brand",
 		},
 
 		{
-			width: 180,
+			width: 300,
 			key: "amount",
 			title: "Valor",
 			dataIndex: "amount",
 		},
+
+		{
+			width: 300,
+			key: "amount",
+			title: "Status do Pagamento",
+			dataIndex: "amount",
+			render: (_: any, record) => {
+				return <>{paymentsStatus(record.payment_status)}</>;
+			},
+		},
 	];
 
-	useEffect(() => {
+	const setDataSubscriptions = (filters?: any) => {
 		let didCancel = false;
 		loadData({
+			filters,
 			current: 1,
 			pageSize: defaultPageSize,
 		})
@@ -109,12 +145,25 @@ const ListPayments: React.FC<ListOfferProps> = ({ customerId }) => {
 				setTablePagination((old) => ({ ...old, total: response.total }));
 			})
 			.catch(() => notification.error({ message: "Erro ao carregar dados!" }));
+	};
+
+	useEffect(() => {
+		setDataSubscriptions();
 	}, [loadData, shouldReloadTable]);
 
 	return (
 		<Container data-testid="container-offers-el">
 			<PageHeader
 				extra={[
+					<Filter
+						key={"filter"}
+						onReset={() => {
+							setDataSubscriptions(null);
+						}}
+						onFilter={(filters) => {
+							setDataSubscriptions(filters);
+						}}
+					/>,
 					<Button
 						key="bt-ds-reload"
 						icon={<ReloadOutlined />}

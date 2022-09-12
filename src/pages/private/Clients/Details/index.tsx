@@ -23,7 +23,8 @@ import {
 	formatPrice,
 } from "../../../../utils/functions";
 import { Container } from "./styles";
-import ListPayments from "../../../../components/Products/Offers/ListPayments";
+import ListPayments from "../../../../components/Clients/Details/ListPayments";
+import Filter from "../../../../components/Clients/Details/filter";
 const { TabPane } = Tabs;
 interface DetailsProps {}
 
@@ -61,22 +62,12 @@ const ClientDetails: React.FC<DetailsProps> = () => {
 
 	const loadDataSubscription = useCallback(async (params: any) => {
 		setTableLoading(true);
-		const {
-			start_date,
-			sortOrder,
-			sortField,
-			end_date,
-			pageSize,
-			current,
-			filters,
-		} = params;
+		const { sortOrder, sortField, pageSize, current, filters } = params;
 		try {
 			const { data } = await api.get(`/crm/customer/${clientId}/subscription`, {
 				params: {
 					page: current,
 					per_page: pageSize,
-					end_date: end_date,
-					start_date: start_date,
 					...(filters ? { filters } : {}),
 					offset: (current - 1) * pageSize,
 					...(sortField ? { order_by: sortField } : {}),
@@ -126,7 +117,7 @@ const ClientDetails: React.FC<DetailsProps> = () => {
 			key: "id",
 			width: 240,
 			sorter: true,
-			title: "Nome",
+			title: "Oferta",
 			dataIndex: "id",
 			render: (_, record) => {
 				return <>{record.offer.name}</>;
@@ -158,24 +149,22 @@ const ClientDetails: React.FC<DetailsProps> = () => {
 		},
 		{
 			width: 180,
-			title: "Período de Testes",
+			title: "Dt fim de carência",
 			key: "grace_period_end_date",
 			render: (_, record) => {
-				return <>{record.grace_period_end_date + " Dias"}</>;
+				return (
+					<>{format(new Date(record.grace_period_end_date), "dd/MM/yyyy")}</>
+				);
 			},
 		},
 	];
 
-	const setDataSubscriptions = (
-		start_date?: string | null,
-		end_date?: string | null
-	) => {
+	const setDataSubscriptions = (filters?: any) => {
 		let didCancel = false;
 		loadDataSubscription({
 			pageSize: defaultPageSize,
-			start_date: start_date,
-			end_date: end_date,
 			current: 1,
+			filters,
 		})
 			.then((response) => {
 				!didCancel && setData(response.data);
@@ -193,7 +182,7 @@ const ClientDetails: React.FC<DetailsProps> = () => {
 	}, [clientId]);
 
 	useEffect(() => {
-		setDataSubscriptions();
+		setDataSubscriptions(null);
 	}, [loadDataSubscription, shouldReloadTable]);
 
 	return (
@@ -278,6 +267,15 @@ const ClientDetails: React.FC<DetailsProps> = () => {
 						<PageHeader
 							subTitle=""
 							extra={[
+								<Filter
+									key={"filter"}
+									onReset={() => {
+										setDataSubscriptions(null);
+									}}
+									onFilter={(filters) => {
+										setDataSubscriptions(filters);
+									}}
+								/>,
 								<Button
 									key="bt-ds-reload"
 									icon={<ReloadOutlined />}

@@ -19,6 +19,7 @@ import { Container, ContainerActions } from "./styles";
 import { formatPrice } from "../../../../utils/functions";
 import EditOffer from "../EditOffer";
 import { Offer } from "../../../../pages/private/Products/model";
+import Filter from "./filter";
 
 export interface ListOfferProps {
 	productId: string;
@@ -128,7 +129,7 @@ const ListOffers: React.FC<ListOfferProps> = ({ productId }) => {
 		{
 			width: 180,
 			key: "grace_period",
-			title: "Período de Testes",
+			title: "Dt de carência",
 			dataIndex: "grace_period",
 			render: (_: any, record) => {
 				return <>{record.grace_period + " Dias"}</>;
@@ -190,9 +191,10 @@ const ListOffers: React.FC<ListOfferProps> = ({ productId }) => {
 		},
 	];
 
-	useEffect(() => {
+	const setDataWithFilters = (filters?: any) => {
 		let didCancel = false;
 		loadData({
+			filters,
 			current: 1,
 			pageSize: defaultPageSize,
 		})
@@ -201,12 +203,25 @@ const ListOffers: React.FC<ListOfferProps> = ({ productId }) => {
 				setTablePagination((old) => ({ ...old, total: response.total }));
 			})
 			.catch(() => notification.error({ message: "Erro ao carregar dados!" }));
+	};
+
+	useEffect(() => {
+		setDataWithFilters();
 	}, [loadData, shouldReloadTable]);
 
 	return (
 		<Container data-testid="container-offers-el">
 			<PageHeader
 				extra={[
+					<Filter
+						key={"filter"}
+						onReset={() => {
+							setDataWithFilters(null);
+						}}
+						onFilter={(filters) => {
+							setDataWithFilters(filters);
+						}}
+					/>,
 					<Button
 						key="bt-ds-reload"
 						icon={<ReloadOutlined />}

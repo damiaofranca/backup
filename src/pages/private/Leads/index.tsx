@@ -10,10 +10,10 @@ import {
 } from "antd";
 import { format } from "date-fns";
 import React, { useCallback, useEffect, useState } from "react";
+import Filter from "../../../components/Leads/filter";
 import { ptBR } from "date-fns/locale";
-import api from "../../../api";
-import { FilterByDate } from "../../../utils/filterByDate";
 import { Container } from "./styles";
+import api from "../../../api";
 
 export const Leads: React.FC = (props) => {
 	const defaultPageSize = 10;
@@ -146,15 +146,11 @@ export const Leads: React.FC = (props) => {
 			.catch(() => notification.error({ message: "Erro ao carregar dados!" }));
 	};
 
-	const setDataLeads = (
-		start_date?: string | null,
-		end_date?: string | null
-	) => {
+	const setDataLeads = (filters?: any) => {
 		let didCancel = false;
 		loadData({
 			pageSize: defaultPageSize,
-			start_date: start_date,
-			end_date: end_date,
+			filters,
 			current: 1,
 		})
 			.then((response) => {
@@ -169,7 +165,7 @@ export const Leads: React.FC = (props) => {
 	};
 
 	useEffect(() => {
-		setDataLeads();
+		setDataLeads(null);
 	}, [loadData, shouldReloadTable]);
 
 	return (
@@ -178,13 +174,13 @@ export const Leads: React.FC = (props) => {
 				title="Leads"
 				subTitle=""
 				extra={[
-					<FilterByDate
+					<Filter
 						key={"filter"}
 						onReset={() => {
-							setDataLeads(null, null);
+							setDataLeads(null);
 						}}
-						onFilter={(start, end) => {
-							setDataLeads(start, end);
+						onFilter={(filter) => {
+							setDataLeads(filter);
 						}}
 					/>,
 					<Button

@@ -1,20 +1,20 @@
-import { AddProduct } from "../../../components/Products/AddProducts";
 import { PlusOutlined, ReloadOutlined } from "@ant-design/icons";
-import { DescriptionShorter } from "../../../utils/description";
-import { Container } from "./styles";
+import {
+	Button,
+	Col,
+	notification,
+	PageHeader,
+	Row,
+	Table,
+	TableColumnType,
+} from "antd";
 import { format } from "date-fns";
 import { useCallback, useEffect, useState } from "react";
-import {
-	TableColumnType,
-	PageHeader,
-	Button,
-	Table,
-	Col,
-	Row,
-	notification,
-} from "antd";
-import api from "../../../api";
 import { Link } from "react-router-dom";
+import api from "../../../api";
+import { AddProduct } from "../../../components/Products/AddProducts";
+import { DescriptionShorter } from "../../../utils/description";
+import { Container } from "./styles";
 
 interface ProductsProps {}
 

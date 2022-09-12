@@ -13,6 +13,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 import api from "../../../api";
+import Filter from "../../../components/Clients/filter";
 import { formatPhoneNumber } from "../../../utils/functions";
 import { Container } from "./styles";
 
@@ -80,6 +81,24 @@ const Clients: React.FC<ClientsProps> = () => {
 				setData(response.data);
 			})
 			.catch(() => notification.error({ message: "Erro ao carregar dados!" }));
+	};
+
+	const getDataWithFilters = (filters?: any) => {
+		let didCancel = false;
+		loadData({
+			pageSize: defaultPageSize,
+			current: 1,
+			filters,
+		})
+			.then((response) => {
+				!didCancel && setData(response.data);
+				setTablePagination((old) => ({ ...old, total: response.total }));
+			})
+			.catch(() => notification.error({ message: "Erro ao carregar dados!" }));
+
+		return () => {
+			didCancel = true;
+		};
 	};
 
 	const tableCols: TableColumnType<any>[] = [
@@ -154,6 +173,15 @@ const Clients: React.FC<ClientsProps> = () => {
 				title="Clientes"
 				subTitle=""
 				extra={[
+					<Filter
+						key={"filter"}
+						onReset={() => {
+							getDataWithFilters(null);
+						}}
+						onFilter={(filter) => {
+							getDataWithFilters(filter);
+						}}
+					/>,
 					<Button
 						key="bt-ds-reload"
 						icon={<ReloadOutlined />}
