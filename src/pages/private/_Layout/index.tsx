@@ -1,33 +1,30 @@
 import {
-	DashboardOutlined,
-	ExclamationCircleOutlined,
-	InboxOutlined,
-	LogoutOutlined,
-	MenuFoldOutlined,
-	MenuUnfoldOutlined,
-	ProfileOutlined,
-	SmileOutlined,
 	TeamOutlined,
-	UserOutlined,
+	InboxOutlined,
+	SmileOutlined,
+	LogoutOutlined,
+	SettingOutlined,
+	ProfileOutlined,
+	MenuFoldOutlined,
+	DashboardOutlined,
+	MenuUnfoldOutlined,
+	ExclamationCircleOutlined,
 } from "@ant-design/icons";
-import { Button, Col, Layout, Menu, Modal, Row } from "antd";
+import Home from "../Home";
+import { Users } from "../Users";
+import { Leads } from "../Leads";
+import Clients from "../Clients";
 import { useState } from "react";
-import { Switch, useHistory, useLocation } from "react-router-dom";
+import Products from "../Products";
+import { Container } from "./styles";
+import Router from "../../../routes/route";
+import ClientDetails from "../Clients/Details";
+import DetailsProduct from "../Products/Details";
 import logoImage from "../../../assets/logo.svg";
 import { useAuth } from "../../../providers/Auth";
-import Router from "../../../routes/route";
 import { getItem, MenuItem } from "../../../utils/getItem";
-import Home from "../Home";
-
-import Clients from "../Clients";
-import ClientDetails from "../Clients/Details";
-import Products from "../Products";
-import DetailsProduct from "../Products/Details";
-
-import { Leads } from "../Leads";
-import { Users } from "../Users";
-
-import { Container } from "./styles";
+import { Button, Col, Layout, Menu, Modal, Row } from "antd";
+import { Switch, useHistory, useLocation } from "react-router-dom";
 
 const { Header, Content, Sider } = Layout;
 
@@ -35,8 +32,8 @@ const items: MenuItem[] = [
 	getItem("Dashboard", "dashboard", <DashboardOutlined />),
 	getItem("Leads", "leads", <ProfileOutlined />),
 	getItem("Clientes", "clients", <InboxOutlined />),
-	getItem("Produtos", "products", <SmileOutlined />),
-	getItem("Administrador", "admin", <UserOutlined />, [
+	getItem("Administrador", "admin", <SettingOutlined />, [
+		getItem("Produtos", "products", <SmileOutlined />),
 		getItem("Usuários", "users", <TeamOutlined />),
 	]),
 ];
